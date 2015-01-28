@@ -5,6 +5,7 @@ class UnionFind {
     UnionFind(int N){
         ids = new int[N];
         sizes = new int[N];
+
         for(int i=0;i<N;i++) {
             ids[i] = i;
             sizes[i] = i;
@@ -26,10 +27,17 @@ class UnionFind {
         return root(origin) == root(dest);
     }
 
+
     private void union(int origin, int dest){
         int originRoot = root(origin);
         int destRoot = root(dest);
-        ids[root(origin)] = root(dest);
+        if(sizes[originRoot] >= sizes[destRoot]){
+            ids[destRoot] = originRoot;
+            sizes[originRoot] += sizes[destRoot];
+        }else{
+            ids[originRoot] = destRoot;
+            sizes[destRoot] += sizes[originRoot];
+        }
     }
 }
 
