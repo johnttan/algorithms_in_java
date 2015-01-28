@@ -1,15 +1,11 @@
 public class PercolationStats {
-    private Percolation percolation;
     private int gridSize;
     private int numTests;
 
     private double[] testResults;
 
-    private double stdev;
-    private double confidenceLo;
-    private double confidenceHi;
-
-    PercolationStats(int N, int T) throws IllegalArgumentException {
+    public PercolationStats(int N, int T) throws IllegalArgumentException
+    {
         if(N <= 0 || T <= 0){
             throw new IllegalArgumentException();
         }
@@ -22,7 +18,7 @@ public class PercolationStats {
 
     }
 
-    private int[] pickBlockedSite()
+    private int[] pickBlockedSite(Percolation percolation)
     {
         int x;
         int y;
@@ -38,10 +34,10 @@ public class PercolationStats {
     {
         double open = 0;
         double openFraction;
+        Percolation percolation = new Percolation(gridSize);
 
-        percolation = new Percolation(gridSize);
         while(!percolation.percolates()){
-            int[] coords = pickBlockedSite();
+            int[] coords = pickBlockedSite(percolation);
             percolation.open(coords[0], coords[1]);
             open ++;
         }
@@ -72,7 +68,7 @@ public class PercolationStats {
     }
 
     public static void main(String[] args){
-        PercolationStats percStatsTest = new PercolationStats(200, 100);
+        PercolationStats percStatsTest = new PercolationStats(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
         System.out.println(percStatsTest.mean());
         System.out.println(percStatsTest.stddev());
         System.out.println(percStatsTest.confidenceLo());

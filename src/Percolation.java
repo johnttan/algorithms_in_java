@@ -3,7 +3,7 @@ public class Percolation {
     private int bound;
     private int numNodes;
     private WeightedQuickUnionUF unionFind;
-    Percolation(int N) throws IllegalArgumentException
+    public Percolation(int N) throws IllegalArgumentException
     {
         if(N <= 0){
             throw new IllegalArgumentException();
@@ -58,20 +58,19 @@ public class Percolation {
         return grid[i-1][j-1];
     }
 
-    public boolean isClosed(int i, int j) throws IndexOutOfBoundsException
+    public boolean isFull(int i, int j) throws IndexOutOfBoundsException
     {
         if(i > bound || i <= 0 || j > bound || j <= 0){
             throw new IndexOutOfBoundsException();
         }
-        return grid[i-1][j-1];
+        return unionFind.connected(0, bound * (i - 1) + j) && isOpen(i, j);
     }
 
     public static void main(String args[])
     {
-        Percolation testPerc = new Percolation(10);
-        for(int i=1;i<=10;i++){
-            testPerc.open(i, 1);
-        }
+        Percolation testPerc = new Percolation(20);
+        testPerc.open(20, 1);
+        System.out.println(testPerc.isFull(12, 10));
         testPerc.percolates();
     }
 }
