@@ -9,70 +9,74 @@ public class Deque<Item> implements Iterable<Item> {
     }
     private Node head;
     private Node tail;
-    private int size = 0;
+    private int sizeNum = 0;
 
     public Deque()
     {
-        head = new Node();
-        tail = head;
     }
     public boolean isEmpty()
     {
-        return size == 0;
+        return sizeNum == 0;
     }
     public int size()
     {
-        return size;
+        return sizeNum;
     }
     public void addFirst(Item item)
     {
+        if(head == null){
+            head = new Node();
+            tail = head;
+        }else{
+            head.previous = new Node();
+            head.previous.next = head;
+            head = head.previous;
+        }
         head.item = item;
-        head.previous = new Node();
-        head.previous.next = head;
-        head = head.previous;
-        size ++;
+        sizeNum ++;
     }
     public void addLast(Item item)
     {
+        if(tail == null){
+            tail = new Node();
+            head = tail;
+        }else{
+            tail.next = new Node();
+            tail.next.previous = tail;
+            tail = tail.next;
+        }
         tail.item = item;
-        tail.next = new Node();
-        tail.next.previous = tail;
-        tail = tail.next;
-        size ++;
+        sizeNum ++;
     }
-    public Item removeFirst () throws NoSuchElementException
+    public Item removeFirst() throws NoSuchElementException
     {
-        Node result;
         if(!isEmpty()){
-            if(head.item == null){
-                result = head.next;
+            Item result = head.item;
+            if(head.next != null){
+                head = head.next;
+                head.previous = null;
             }else{
-                result = head;
+                head = null;
+                tail = null;
             }
-            if(head.next.next != null){
-                head.next.next.previous = head;
-                head.next = head.next.next;
-            }
-            size --;
-            return result.item;
+            sizeNum --;
+            return result;
         }else{
             throw new NoSuchElementException();
         }
     }
     public Item removeLast()
     {
-        Node result;
         if(!isEmpty()){
-            if(tail.item == null){
-                result = tail.previous;
+            Node result = tail;
+            if(tail.previous != null){
+                tail = tail.previous;
+                tail.next = null;
             }else{
-                result = tail;
+                head = null;
+                tail = null;
             }
-            if(tail.previous.previous != null){
-                tail.previous.previous.next = tail;
-                tail.previous = tail.previous.previous;
-            }
-            size --;
+            sizeNum --;
             return result.item;
         }else{
             throw new NoSuchElementException();
@@ -87,7 +91,7 @@ public class Deque<Item> implements Iterable<Item> {
         private Node current = head;
         public boolean hasNext()
         {
-            return current.item != null;
+            return current != null;
         }
         public void remove() throws UnsupportedOperationException
         {
@@ -106,45 +110,45 @@ public class Deque<Item> implements Iterable<Item> {
     public static void main(String[] args)
     {
         Deque testD = new Deque();
-//        for(int i=0;i<20;i++)
-//        {
-//            testD.addFirst("test" + i);
-//        }
-//
-//        while(!testD.isEmpty())
-//        {
-//            System.out.println(testD.removeFirst());
-//        }
-//
-//        testD = new Deque();
-//        for(int i=0;i<20;i++)
-//        {
-//            testD.addLast("test" + i);
-//        }
-//
-//        while(!testD.isEmpty())
-//        {
-//            System.out.println(testD.removeLast());
-//        }
+        for(int i=0;i<20;i++)
+        {
+            testD.addFirst("test" + i);
+        }
+
+        while(!testD.isEmpty())
+        {
+            System.out.println(testD.removeFirst());
+        }
+
+        testD = new Deque();
+        for(int i=0;i<20;i++)
+        {
+            testD.addLast("test" + i);
+        }
+
+        while(!testD.isEmpty())
+        {
+            System.out.println(testD.removeLast());
+        }
 //
         testD = new Deque();
         for(int i=0;i<20;i++)
         {
             testD.addLast("test" + i);
-            System.out.println(testD.size());
+//            System.out.println(testD.size());
         }
         for(Object x : testD)
         {
             System.out.println(x);
         }
-        int counter = 0;
         while(!testD.isEmpty())
         {
-            counter ++;
-            System.out.println(testD.size());
+//            System.out.println(testD.size());
             System.out.println(testD.removeFirst());
-            System.out.println(counter);
 //            testD.removeFirst();
         }
+
+        testD = new Deque();
+
     }
 }
