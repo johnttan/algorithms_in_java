@@ -1,14 +1,25 @@
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private Item[] queueArray;
     private int size;
+    private int tail = 0;
 
+    private void resize(boolean up)
+    {
+        Item[] tempArray = queueArray;
+        int factor = up ? 2 : 1/2;
+        queueArray = (Item[]) new Object[queueArray.length * factor];
+        for(int i = 0;i<tail;i++){
+            queueArray[i] = tempArray[i];
+        }
+    }
 
     public RandomizedQueue()
     {
-        queueList = (Item[]) new Object[1];
+        queueArray = (Item[]) new Object[1];
     }
     public boolean isEmpty()
     {
@@ -20,15 +31,51 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
     public void enqueue(Item item) throws NullPointerException
     {
+        if(item == null){
+            throw new NullPointerException();
+        }
+
+        queueArray[tail] = item;
+        tail ++;
+        size ++;
+
+        if(size == queueArray.length){
+            resize(true);
+        }
 
     }
     public Item dequeue() throws NoSuchElementException
     {
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
 
+        int random = StdRandom.uniform(tail);
+
+        Item temp = queueArray[tail-1];
+        Item result = queueArray[random];
+        queueArray[random] = temp;
+        queueArray[tail-1] = null;
+
+        tail --;
+        size --;
+        if(size <= size() / 4)
+        {
+            resize(false);
+        }
+        return result;
     }
     public Item sample() throws NoSuchElementException
     {
+        if(isEmpty()){
+            throw new NoSuchElementException();
+        }
 
+        int random = StdRandom.uniform(tail);
+
+        Item result = queueArray[random];
+
+        return result;
     }
     public Iterator<Item> iterator()
     {
@@ -37,10 +84,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private class QueueIterator implements Iterator<Item>
     {
-        private Node current = head;
         public boolean hasNext()
         {
-            return current.item != null;
+            return !isEmpty();
         }
         public void remove() throws UnsupportedOperationException
         {
@@ -51,14 +97,19 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             if(!hasNext()){
                 throw new NoSuchElementException();
             }
-            Item item = current.item;
-            current = current.next;
-            return item;
+            return sample();
         }
     }
 
     public static void main(String[] args)
     {
+        RandomizedQueue testQueue = new RandomizedQueue();
+        for(int i=0;i<10;i++){
+            testQueue.enqueue(i);
+        }
 
+        while(!testQueue.isEmpty()){
+            System.out.println(testQueue.dequeue());
+        }
     }
 }
