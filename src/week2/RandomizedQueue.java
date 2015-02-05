@@ -1,5 +1,3 @@
-import sun.jvm.hotspot.ui.tree.RootTreeNodeAdapter;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
