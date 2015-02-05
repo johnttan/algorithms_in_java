@@ -84,9 +84,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private class QueueIterator implements Iterator<Item>
     {
+        private int counter = 0;
         public boolean hasNext()
         {
-            return !isEmpty();
+            return !(counter == size());
         }
         public void remove() throws UnsupportedOperationException
         {
@@ -97,6 +98,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             if(!hasNext()){
                 throw new NoSuchElementException();
             }
+            counter ++;
             return sample();
         }
     }
@@ -110,6 +112,22 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
         while(!testQueue.isEmpty()){
             System.out.println(testQueue.dequeue());
+        }
+
+        testQueue = new RandomizedQueue();
+        for(int i=0;i<10;i++){
+            testQueue.enqueue(i);
+        }
+        for(Object x : testQueue){
+            System.out.println(x);
+        }
+
+        testQueue = new RandomizedQueue();
+        for(int i=0;i<10;i++){
+            testQueue.enqueue(i);
+        }
+        for(int i=0;i<=testQueue.size();i++){
+            System.out.println(testQueue.sample());
         }
     }
 }
