@@ -89,8 +89,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         private RandomizedQueue tempQueue;
         public QueueIterator() {
             tempQueue = new RandomizedQueue();
-            for(Item x : queueArray){
-                tempQueue.enqueue(x);
+            for(int i = 0; i < size(); i++){
+                tempQueue.enqueue(queueArray[i]);
             }
         }
         public boolean hasNext()
@@ -131,13 +131,13 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 //            System.out.println(testQueue.dequeue());
 //        }
 //
-//        testQueue = new RandomizedQueue();
-//        for(int i=0;i<10;i++){
-//            testQueue.enqueue(i);
-//        }
-//        for(Object x : testQueue){
-//            System.out.println(x);
-//        }
+        testQueue = new RandomizedQueue();
+        for(int i=0;i<10;i++){
+            testQueue.enqueue(i);
+        }
+        for(Object x : testQueue){
+            System.out.println(x);
+        }
 //
 //        testQueue = new RandomizedQueue();
 //        for(int i=0;i<100;i++){
@@ -146,11 +146,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 //        for(int i=0;i<=testQueue.size();i++){
 //            System.out.println(testQueue.sample());
 //        }
-
-        testQueue = new RandomizedQueue();
-        testQueue.enqueue(1);
-        testQueue.dequeue();
-        testQueue.enqueue(1);
-        testQueue.dequeue();
+//
+//        testQueue = new RandomizedQueue();
+//        testQueue.enqueue(1);
+//        testQueue.dequeue();
+//        testQueue.enqueue(1);
+//        testQueue.dequeue();
     }
 }
