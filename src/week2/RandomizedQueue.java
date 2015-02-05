@@ -1,6 +1,7 @@
+import sun.jvm.hotspot.ui.tree.RootTreeNodeAdapter;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Random;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
     private Item[] queueArray;
@@ -11,6 +12,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     {
         Item[] tempArray = queueArray;
         int factor = up ? 2 : 1/2;
+        if(factor < 1){
+            factor = 1;
+        }
         queueArray = (Item[]) new Object[queueArray.length * factor];
         for(int i = 0;i<tail;i++){
             queueArray[i] = tempArray[i];
@@ -112,37 +116,43 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     public static void main(String[] args)
     {
         RandomizedQueue testQueue = new RandomizedQueue();
-        for(int i=0;i<100;i++){
-            testQueue.enqueue(i);
-        }
-
-        for(int i=0;i<50;i++){
-            testQueue.dequeue();
-        }
-        for(int i=0;i<1000;i++){
-            testQueue.enqueue(i);
-        }
-        for(int i=0;i<1000;i++){
-            testQueue.dequeue();
-        }
-        while(!testQueue.isEmpty()){
-            System.out.println(testQueue.dequeue());
-        }
+//        for(int i=0;i<100;i++){
+//            testQueue.enqueue(i);
+//        }
+//
+//        for(int i=0;i<50;i++){
+//            testQueue.dequeue();
+//        }
+//        for(int i=0;i<1000;i++){
+//            testQueue.enqueue(i);
+//        }
+//        for(int i=0;i<1000;i++){
+//            testQueue.dequeue();
+//        }
+//        while(!testQueue.isEmpty()){
+//            System.out.println(testQueue.dequeue());
+//        }
+//
+//        testQueue = new RandomizedQueue();
+//        for(int i=0;i<10;i++){
+//            testQueue.enqueue(i);
+//        }
+//        for(Object x : testQueue){
+//            System.out.println(x);
+//        }
+//
+//        testQueue = new RandomizedQueue();
+//        for(int i=0;i<100;i++){
+//            testQueue.enqueue(i);
+//        }
+//        for(int i=0;i<=testQueue.size();i++){
+//            System.out.println(testQueue.sample());
+//        }
 
         testQueue = new RandomizedQueue();
-        for(int i=0;i<10;i++){
-            testQueue.enqueue(i);
-        }
-        for(Object x : testQueue){
-            System.out.println(x);
-        }
-
-        testQueue = new RandomizedQueue();
-        for(int i=0;i<100;i++){
-            testQueue.enqueue(i);
-        }
-        for(int i=0;i<=testQueue.size();i++){
-            System.out.println(testQueue.sample());
-        }
+        testQueue.enqueue(1);
+        testQueue.dequeue();
+        testQueue.enqueue(1);
+        testQueue.dequeue();
     }
 }
