@@ -22,8 +22,11 @@ public class Deque<Item> implements Iterable<Item> {
     {
         return sizeNum;
     }
-    public void addFirst(Item item)
+    public void addFirst(Item item) throws NullPointerException
     {
+        if(item == null){
+            throw new NullPointerException();
+        }
         if(head == null){
             head = new Node();
             tail = head;
@@ -35,8 +38,11 @@ public class Deque<Item> implements Iterable<Item> {
         head.item = item;
         sizeNum ++;
     }
-    public void addLast(Item item)
+    public void addLast(Item item) throws NullPointerException
     {
+        if(item == null){
+            throw new NullPointerException();
+        }
         if(tail == null){
             tail = new Node();
             head = tail;

@@ -84,7 +84,13 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private class QueueIterator implements Iterator<Item>
     {
-        private RandomizedQueue tempQueue = new RandomizedQueue();
+        private RandomizedQueue tempQueue;
+        public QueueIterator() {
+            tempQueue = new RandomizedQueue();
+            for(Item x : queueArray){
+                tempQueue.enqueue(x);
+            }
+        }
         public boolean hasNext()
         {
             return !(tempQueue.isEmpty());
