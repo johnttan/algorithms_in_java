@@ -1,3 +1,5 @@
+package week1;
+
 public class PercolationStats {
     private int gridSize;
     private int numTests;

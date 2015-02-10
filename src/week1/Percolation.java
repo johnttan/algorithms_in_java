@@ -1,3 +1,5 @@
+package week1;
+
 //TODO:
 //Fix backwash and N==1 N=2 corner cases.
 public class Percolation {

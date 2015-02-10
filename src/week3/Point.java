@@ -9,7 +9,6 @@
  * Description: An immutable data type for points in the plane.
  *
  *************************************************************************/
-
 import java.util.Comparator;
 
 public class Point implements Comparable<Point> {
