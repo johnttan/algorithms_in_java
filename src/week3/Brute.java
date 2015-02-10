@@ -43,7 +43,7 @@ public class Brute {
                             result[1].drawTo(result[2]);
                             result[2].drawTo(result[3]);
 
-                            System.out.println(String.format("(%d, %d) -> (%d, %d) -> (%d, %d) -> (%d, %d)", result[0].x, result[0].y, result[1].x, result[1].y, result[2].x, result[2].y, result[3].x, result[3].y));
+                            System.out.println(String.format("%s -> %s -> %s -> %s", result[0].toString(), result[1].toString(), result[2].toString(), result[3].toString()));
                         }
                     }
                 }

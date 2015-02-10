@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Fast {
@@ -19,11 +18,16 @@ public class Fast {
             Arrays.sort(points, Point.SLOPE_ORDER);
 
             int j = 0;
-            ArrayList<Point> = new ArrayList<Point>();
 
-            while(j < points.length){
+            ArrayList<Point> current;
+            for(int q=0;q<points.length;q++){
+                while(j < points.length - 4){
+                    if(points[q].slopeTo(points[j]))
 
+                    j++;
+                }
             }
+
 
             i++;
         }

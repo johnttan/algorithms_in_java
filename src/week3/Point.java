@@ -14,15 +14,19 @@ import java.util.Comparator;
 public class Point implements Comparable<Point> {
 
     // compare points by slope
-    public final Comparator<Point> SLOPE_ORDER = new SlopeOrder();       // YOUR DEFINITION HERE
+    public final Comparator<Point> SLOPE_ORDER = new SlopeOrder(Point.this);       // YOUR DEFINITION HERE
 
     private final int x;                              // x coordinate
     private final int y;                              // y coordinate
 
     public static class SlopeOrder implements Comparator<Point> {
+        private Point currentPoint;
+        SlopeOrder (Point point) {
+            currentPoint = point;
+        }
         public int compare(Point v, Point w)
         {
-            return (int)v.slopeTo(w);
+            return (int)v.slopeTo(currentPoint) - (int)w.slopeTo(currentPoint);
         }
     }
 
