@@ -27,14 +27,18 @@ public class Fast {
             points[q].draw();
 
             ArrayList<Point> current = new ArrayList<Point>();
+            current.add(points[q]);
 
             for(int j=0;j<points.length;j++){
+//                System.out.println(points[q].slopeTo(pointsCopy[j]));
+//                System.out.println(pointsCopy[j]);
                 if(pointsCopy[j].compareTo(points[q]) != 0){
                     if(current.isEmpty()){
-                        current.add(pointsCopy[j]);
+                        System.out.println("SHOULD NOT SEE THIS");
+//                        current.add(pointsCopy[j]);
                     }else if(points[q].slopeTo(pointsCopy[j]) == points[q].slopeTo(current.get(current.size() - 1))){
                         current.add(pointsCopy[j]);
-                        if(j == points.length -1 && current.size() >= 3){
+                        if(j == points.length -1 && current.size() >= 4){
                             Point[] temp = new Point[current.size()];
                             temp = current.toArray(temp);
                             Arrays.sort(temp);
@@ -48,9 +52,14 @@ public class Fast {
                                     result += " -> ";
                                 }
                             }
-                            System.out.println(result);
+                            String key = String.format("%s %s", temp[0].toString(), temp[temp.length-1].toString());
+                            if(!table.containsKey(key)){
+                                System.out.println(result);
+                                table.put(key, true);
+                            }
+
                         }
-                    }else if(current.size() >= 3){
+                    }else if(current.size() >= 4){
                         Point[] temp = new Point[current.size()];
                         temp = current.toArray(temp);
                         Arrays.sort(temp);
@@ -64,11 +73,17 @@ public class Fast {
                                 result += " -> ";
                             }
                         }
-                        System.out.println(result);
+                        String key = String.format("%s %s", temp[0].toString(), temp[temp.length-1].toString());
+                        if(!table.containsKey(key)){
+                            System.out.println(result);
+                            table.put(key, true);
+                        }
                         current = new ArrayList<Point>();
+                        current.add(points[q]);
                         current.add(pointsCopy[j]);
                     }else{
                         current = new ArrayList<Point>();
+                        current.add(points[q]);
                         current.add(pointsCopy[j]);
                     }
                 }
