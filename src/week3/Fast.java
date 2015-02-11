@@ -42,7 +42,6 @@ public class Fast {
                             Point[] temp = new Point[current.size()];
                             temp = current.toArray(temp);
                             Arrays.sort(temp);
-                            temp[0].drawTo(temp[temp.length-1]);
 
                             String result = "";
 
@@ -55,6 +54,7 @@ public class Fast {
                             String key = String.format("%s %s", temp[0].toString(), temp[temp.length-1].toString());
                             if(!table.containsKey(key)){
                                 System.out.println(result);
+                                temp[0].drawTo(temp[temp.length-1]);
                                 table.put(key, true);
                             }
 
@@ -63,7 +63,6 @@ public class Fast {
                         Point[] temp = new Point[current.size()];
                         temp = current.toArray(temp);
                         Arrays.sort(temp);
-                        temp[0].drawTo(temp[temp.length-1]);
 
                         String result = "";
 
@@ -76,6 +75,7 @@ public class Fast {
                         String key = String.format("%s %s", temp[0].toString(), temp[temp.length-1].toString());
                         if(!table.containsKey(key)){
                             System.out.println(result);
+                            temp[0].drawTo(temp[temp.length-1]);
                             table.put(key, true);
                         }
                         current = new ArrayList<Point>();
