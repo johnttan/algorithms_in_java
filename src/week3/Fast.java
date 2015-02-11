@@ -1,4 +1,5 @@
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -24,29 +25,34 @@ public class Fast {
         for(int q=0;q<points.length;q++){
             Arrays.sort(pointsCopy, points[q].SLOPE_ORDER);
             points[q].draw();
-            int j = 0;
 
-            while(j < points.length - 2){
-                if(points[q].compareTo(pointsCopy[j]) != 0 && points[q].compareTo(pointsCopy[j+1]) != 0 && points[q].compareTo(pointsCopy[j+2]) != 0
-                        && pointsCopy[j].compareTo(pointsCopy[j+1]) != 0 && pointsCopy[j].compareTo(pointsCopy[j+2]) != 0 && pointsCopy[j+1].compareTo(pointsCopy[j+2]) != 0){
+            ArrayList<Point> current = new ArrayList<Point>();
 
+            for(int j=0;j<points.length;j++){
+                if(pointsCopy[j].compareTo(points[q]) != 0){
+                    if(current.isEmpty()){
+                        current.add(pointsCopy[j]);
+                    }else if(points[q].slopeTo(pointsCopy[j]) == points[q].slopeTo(current.get(current.size() - 1))){
+                        current.add(pointsCopy[j]);
+                    }else if(current.size() >= 3){
+                        Point[] temp = new Point[current.size()];
+                        temp = current.toArray(temp);
+                        Arrays.sort(temp);
+                        temp[0].drawTo(temp[temp.length-1]);
 
-                    if(points[q].slopeTo(pointsCopy[j]) == points[q].slopeTo(pointsCopy[j + 1]) && points[q].slopeTo(pointsCopy[j]) == points[q].slopeTo(pointsCopy[j + 2])){
-                        Point[] result = new Point[4];
-                        result[0] = points[q];
-                        result[1] = pointsCopy[j];
-                        result[2] = pointsCopy[j+1];
-                        result[3] = pointsCopy[j+2];
-                        Arrays.sort(result);
-                        String resultStr = String.format("%s -> %s -> %s -> %s", result[0].toString(), result[1].toString(), result[2].toString(), result[3].toString());
-                        if(!table.containsKey(resultStr)){
-                            result[0].drawTo(result[3]);
-                            table.put(resultStr, true);
-                            System.out.println(resultStr);
+                        String result = "";
+
+                        for(Point point : temp){
+                            result += point.toString();
+                            if(temp[temp.length-1] != point){
+                                result += " -> ";
+                            }
                         }
+                        System.out.println(result);
+                    }else{
+                        current = new ArrayList<Point>();
                     }
                 }
-                j++;
             }
         }
     }
