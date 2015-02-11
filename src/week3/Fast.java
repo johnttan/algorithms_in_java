@@ -34,6 +34,22 @@ public class Fast {
                         current.add(pointsCopy[j]);
                     }else if(points[q].slopeTo(pointsCopy[j]) == points[q].slopeTo(current.get(current.size() - 1))){
                         current.add(pointsCopy[j]);
+                        if(j == points.length -1 && current.size() >= 3){
+                            Point[] temp = new Point[current.size()];
+                            temp = current.toArray(temp);
+                            Arrays.sort(temp);
+                            temp[0].drawTo(temp[temp.length-1]);
+
+                            String result = "";
+
+                            for(Point point : temp){
+                                result += point.toString();
+                                if(temp[temp.length-1] != point){
+                                    result += " -> ";
+                                }
+                            }
+                            System.out.println(result);
+                        }
                     }else if(current.size() >= 3){
                         Point[] temp = new Point[current.size()];
                         temp = current.toArray(temp);
@@ -49,8 +65,11 @@ public class Fast {
                             }
                         }
                         System.out.println(result);
+                        current = new ArrayList<Point>();
+                        current.add(pointsCopy[j]);
                     }else{
                         current = new ArrayList<Point>();
+                        current.add(pointsCopy[j]);
                     }
                 }
             }
