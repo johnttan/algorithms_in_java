@@ -19,7 +19,7 @@ public class Point implements Comparable<Point> {
     private final int x;                              // x coordinate
     private final int y;                              // y coordinate
 
-    public static class SlopeOrder implements Comparator<Point> {
+    private static class SlopeOrder implements Comparator<Point> {
         private Point currentPoint;
         SlopeOrder (Point point) {
             currentPoint = point;
@@ -51,7 +51,14 @@ public class Point implements Comparable<Point> {
 
     // slope between this point and that point
     public double slopeTo(Point that) {
-        return (that.x - this.x) / (that.y - this.y);
+        if(that.x == this.x){
+            if(this.y <= that.y){
+                return Double.POSITIVE_INFINITY;
+            }else if(this.y > that.y){
+                return Double.NEGATIVE_INFINITY;
+            }
+        }
+        return (that.y - this.y) / (that.x - this.x);
     }
 
     // is this point lexicographically smaller than that one?
@@ -81,10 +88,18 @@ public class Point implements Comparable<Point> {
     // unit test
     public static void main(String[] args) {
         Point test = new Point(1, 1);
-        Point test2 = new Point(2, 2);
-
+        Point test2 = new Point(1, 2);
         double compare = test.slopeTo(test2);
+        assert compare == Double.POSITIVE_INFINITY : "should be positive infinity";
 
-        System.out.print(compare);
+        test = new Point(0, 0);
+        test2 = new Point(0, -1);
+        compare = test.slopeTo(test2);
+        assert compare == Double.NEGATIVE_INFINITY : "should be negative infinity";
+
+        test = new Point(1, 1);
+        test2 = new Point(2, 2);
+        compare = test.slopeTo(test2);
+        assert compare == 1 : "should be 1";
     }
 }
