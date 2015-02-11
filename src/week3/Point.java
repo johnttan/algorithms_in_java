@@ -27,7 +27,7 @@ public class Point implements Comparable<Point> {
         public int compare(Point v, Point w)
         {
             Point currentPoint = Point.this;
-            int result = (int) (v.slopeTo(currentPoint) - w.slopeTo(currentPoint));
+            double result = (v.slopeTo(currentPoint) - w.slopeTo(currentPoint));
             if(result < 0){
                 return -1;
             }else if(result > 0){
