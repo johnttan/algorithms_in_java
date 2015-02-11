@@ -1,5 +1,6 @@
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class Brute {
     public static void main (String[] args) {
@@ -17,11 +18,13 @@ public class Brute {
             points[i] = new Point(x, y);
             i++;
         }
-        System.out.println("Completed loading");
-        System.out.println(points.length);
+//        System.out.println("Completed loading");
+//        System.out.println(points.length);
+        HashMap table = new HashMap();
+
         for(int p = 0;p<points.length;p++){
             points[p].draw();
-            System.out.println(p);
+//            System.out.println(p);
             for(int j=0;j<points.length;j++){
                 for(int k=0;k<points.length;k++){
                     for(int z=0;z<points.length;z++){
@@ -33,7 +36,7 @@ public class Brute {
                             double slope2 = current.slopeTo(points[k]);
                             double slope3 = current.slopeTo(points[z]);
                             if(slope1 == slope2 && slope2 == slope3){
-                                System.out.println(String.format("%f %f %f", slope1, slope2, slope3));
+//                                System.out.println(String.format("%f %f %f", slope1, slope2, slope3));
                                 result[0] = current;
                                 result[1] = points[j];
                                 result[2] = points[k];
@@ -43,8 +46,13 @@ public class Brute {
                                 result[0].drawTo(result[1]);
                                 result[1].drawTo(result[2]);
                                 result[2].drawTo(result[3]);
-                                System.out.println(String.format("%d %d %d %d", p, j, k, z));
-                                System.out.println(String.format("%s -> %s -> %s -> %s", result[0].toString(), result[1].toString(), result[2].toString(), result[3].toString()));
+//                                System.out.println(String.format("%d %d %d %d", p, j, k, z));
+                                String resultString = String.format("%s -> %s -> %s -> %s", result[0].toString(), result[1].toString(), result[2].toString(), result[3].toString());
+                                if(!table.containsKey(resultString)){
+                                    table.put(resultString, true);
+                                    System.out.println(resultString);
+                                }
+
                             }
                         }
 
