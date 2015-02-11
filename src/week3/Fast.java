@@ -1,5 +1,6 @@
 
 import java.util.Arrays;
+
 public class Fast {
     public static void main (String[] args) {
         StdDraw.setXscale(0, 32768);
@@ -15,7 +16,6 @@ public class Fast {
             int y = file.readInt();
             points[i] = new Point(x, y);
 
-            ArrayList<Point> current;
             i++;
         }
         Point[] pointsCopy = Arrays.copyOf(points, points.length);
