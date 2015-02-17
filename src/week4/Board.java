@@ -35,7 +35,7 @@ public class Board {
         int[] swap2 = null;
         twinGrid = new int[N][N];
         neighborsList = new ArrayList<int[][]>();
-
+//        StdOut.println(this.toString());
 //      Iterate through and precompute swaps, neighbors, hamming distance, and manhattan distance.
         for(int i=0;i<N;i++){
             for(int j=0;j<N;j++){
@@ -49,7 +49,7 @@ public class Board {
                         hammingDistance ++;
                     }
                     manhattanDistance += Math.abs(realX - i) + Math.abs(realY - j);
-                    if(j + 1 < N && swap1 == null){
+                    if(j + 1 < N && swap1 == null && board[i][j+1] != 0){
                         swap1 = new int[2];
                         swap1[0] = i;
                         swap1[1] = j+1;
@@ -117,6 +117,9 @@ public class Board {
     {
 //        StdOut.println("NEW GRID");
 //        StdOut.println(new Board(twinGrid));
+//        StdOut.println("OLD GRID");
+//        StdOut.println(this.toString());
+
         return new Board(twinGrid);
     }
 

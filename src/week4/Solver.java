@@ -21,7 +21,7 @@ public class Solver {
         SearchNode(Board grid, int numMoves)
         {
             board = grid;
-            priority = grid.hamming() + numMoves;
+            priority = grid.manhattan() + numMoves;
             previous = null;
             count = numMoves;
         }
@@ -53,13 +53,7 @@ public class Solver {
 
         public int compareTo(SearchNode otherNode)
         {
-            if (this.getPriority() == otherNode.getPriority()){
-                return 0;
-            }else if(this.getPriority() > otherNode.getPriority()){
-                return 1;
-            }else{
-                return -1;
-            }
+            return Integer.compare(this.getPriority(), otherNode.getPriority());
         }
     }
 
@@ -68,19 +62,22 @@ public class Solver {
         queueOne = new MinPQ<SearchNode>();
         queueTwo = new MinPQ<SearchNode>();
 
-        searchOne = new SearchNode(initial, 0);
-        searchTwo = new SearchNode(initial.twin(), 0);
+        searchOne = new SearchNode(initial, searchOneCount);
+        searchTwo = new SearchNode(initial.twin(), searchTwoCount);
 
         queueOne.insert(searchOne);
         queueTwo.insert(searchTwo);
 
         while(!searchOne.getBoard().isGoal() && !searchTwo.getBoard().isGoal()){
             if(!queueOne.isEmpty()){
-                searchOneCount ++;
                 searchOne = queueOne.delMin();
-                for(Board board : searchOne.getBoard().neighbors()) {
-                    if(!(searchOne.getPrevious() != null && board.equals(searchOne.getPrevious().getBoard()))) {
-                        SearchNode currentOne = new SearchNode(board, searchOneCount);
+//                StdOut.print(String.format("EACH WHILE %d \n", searchOneCount));
+//                StdOut.println(searchOne.getBoard().toString());
+//                StdOut.println(String.format("Hamming %d", searchOne.getBoard().hamming()));
+
+                for(Board subBoard : searchOne.getBoard().neighbors()) {
+                    if(!(searchOne.getPrevious() != null && subBoard.equals(searchOne.getPrevious().getBoard()))) {
+                        SearchNode currentOne = new SearchNode(subBoard, searchOne.getCount()+1);
                         currentOne.assignPrevious(searchOne);
                         queueOne.insert(currentOne);
                     }
@@ -88,16 +85,17 @@ public class Solver {
             }
 
             if(!queueTwo.isEmpty()){
-                searchTwoCount ++;
                 searchTwo = queueTwo.delMin();
-                for(Board board : searchTwo.getBoard().neighbors()){
-                    if(!(searchTwo.getPrevious() != null && board.equals(searchTwo.getPrevious().getBoard()))){
-                        SearchNode currentTwo = new SearchNode(board, searchTwoCount);
+                for(Board subBoardTwo : searchTwo.getBoard().neighbors()){
+                    if(!(searchTwo.getPrevious() != null && subBoardTwo.equals(searchTwo.getPrevious().getBoard()))){
+                        SearchNode currentTwo = new SearchNode(subBoardTwo, searchTwo.getCount()+1);
                         currentTwo.assignPrevious(searchTwo);
-                        queueOne.insert(currentTwo);
+                        queueTwo.insert(currentTwo);
                     }
                 }
             }
+
+
         }
     }
 
@@ -124,7 +122,7 @@ public class Solver {
             SearchNode current = searchOne;
 
             while(current != null){
-                solutionQueue.add(current.getBoard());
+                solutionQueue.addFirst(current.getBoard());
                 current = current.getPrevious();
             }
             return solutionQueue;
