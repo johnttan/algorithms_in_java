@@ -1,4 +1,5 @@
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 public class Board {
     private int[][] board;
@@ -7,7 +8,16 @@ public class Board {
     private int manhattanDistance;
     private int[][]twinGrid;
     private ArrayDeque<Board>neighborsQueue;
+    private ArrayList<int[][]>neighborsList;
 
+    private int[][] copyBoard(int[][] blocks){
+        int[][] result = new int[blocks.length][blocks.length];
+        for(int i=0;i<blocks.length;i++){
+            for(int j=0;j<blocks.length;j++){
+                result[i][j] = blocks[i][j];
+            }
+        }
+    }
 
     public Board(int[][] blocks) throws NullPointerException
     {
@@ -23,33 +33,65 @@ public class Board {
         int[] swap1 = null;
         int[] swap2 = null;
         twinGrid = new int[N][N];
+        neighborsList = new ArrayList<int[][]>();
 
-//      Iterate through and precompute swaps, hamming distance, and manhattan distance.
+//      Iterate through and precompute swaps, neighbors, hamming distance, and manhattan distance.
         for(int i=0;i<N;i++){
             for(int j=0;j<N;j++){
                 twinGrid[i][j] = board[i][j];
-                int realX = board[i][j] % N;
-                int realY = board[i][j] / N;
-                if(i != realX || j != realY){
-                    hammingDistance ++;
-                }
-                manhattanDistance += Math.abs(realX - i) + Math.abs(realY - j);
+                if(board[i][j] != 0){
+                    int realY = board[i][j] % N;
+                    int realX = board[i][j] / N;
+                    System.out.print(String.format("%d (%d %d)->(%d %d) ", board[i][j], i, j, realX, realY));
+                    if(i != realX || j != realY){
+                        hammingDistance ++;
+                    }
+                    manhattanDistance += Math.abs(realX - i) + Math.abs(realY - j);
 
-                if(swap1 == null && board[i][j] != 0){
-                    swap1 = new int[2];
-                    swap1[0] = i;
-                    swap1[1] = j;
-                }else if(swap2 == null && board[i][j] != 0){
-                    swap2 = new int[2];
-                    swap2[0] = i;
-                    swap2[1] = j;
+                    if(swap1 == null){
+                        swap1 = new int[2];
+                        swap1[0] = i;
+                        swap1[1] = j;
+                    }else if(swap2 == null){
+                        swap2 = new int[2];
+                        swap2[0] = i;
+                        swap2[1] = j;
+                    }
+                }else{
+                    if(i + 1 < N){
+                        if(j + 1 < N){
+                            int[][] neighbor1 = copyBoard(board);
+                            neighbor1[i][j] = board[i+1][j+1];
+                            neighbor1[i+1][j+1] = board[i][j];
+                            neighborsList.add(neighbor1);
+                        }
+                        if(j - 1 >= 0){
+                            int[][] neighbor2 = copyBoard(board);
+                            neighbor2[i][j] = board[i+1][j-1];
+                            neighbor2[i+1][j-1] = board[i][j];
+                            neighborsList.add(neighbor2);
+                        }
+                    }
+                    if(i - 1 >= 0){
+                        if(j + 1 < N){
+                            int[][] neighbor3 = copyBoard(board);
+                            neighbor3[i][j] = board[i-1][j+1];
+                            neighbor3[i-1][j+1] = board[i][j];
+                            neighborsList.add(neighbor3);
+                        }
+                        if(j - 1 >= 0){
+                            int[][] neighbor4 = copyBoard(board);
+                            neighbor4[i][j] = board[i-1][j-1];
+                            neighbor4[i-1][j-1] = board[i][j];
+                            neighborsList.add(neighbor4);
+                        }
+                    }
                 }
             }
         }
 //      Precompute swaps for twin.
         twinGrid[swap1[0]][swap1[1]] = board[swap2[0]][swap2[1]];
         twinGrid[swap2[0]][swap2[1]] = board[swap1[0]][swap1[1]];
-
 
     }
 
@@ -107,7 +149,7 @@ public class Board {
 
     public Iterable<Board> neighbors()
     {
-
+        return neighborsQueue;
     }
 
 
@@ -122,11 +164,14 @@ public class Board {
 //            System.out.println("");
         }
         Board testBoard = new Board(testGrid);
-
+        System.out.println("\nMANHATTAN");
         System.out.println(testBoard.manhattan());
+        assert testBoard.manhattan() == 20 : "manhattan should be 20";
+        assert testBoard.hamming() == 7: "hamming should be 7";
+        System.out.println("HAMMING");
         System.out.println(testBoard.hamming());
         System.out.println(testBoard.toString());
-        System.out.println(testBoard.twin().toString());
+//        System.out.println(testBoard.twin().toString());
 
 
     }
