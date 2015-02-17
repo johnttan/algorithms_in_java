@@ -49,16 +49,15 @@ public class Board {
                         hammingDistance ++;
                     }
                     manhattanDistance += Math.abs(realX - i) + Math.abs(realY - j);
-
-                    if(swap1 == null){
+                    if(j + 1 < N && swap1 == null){
                         swap1 = new int[2];
                         swap1[0] = i;
-                        swap1[1] = j;
-                    }else if(swap2 == null){
+                        swap1[1] = j+1;
                         swap2 = new int[2];
                         swap2[0] = i;
                         swap2[1] = j;
                     }
+
                 }else{
 //                    System.out.println(String.format("\nCOMPUTING NEIGHBORS: %d, %d, %d", i, j, board[i][j]));
                     if(i + 1 < N){
@@ -116,6 +115,8 @@ public class Board {
 
     public Board twin()
     {
+//        StdOut.println("NEW GRID");
+//        StdOut.println(new Board(twinGrid));
         return new Board(twinGrid);
     }
 
