@@ -7,7 +7,7 @@ public class Board {
     private int hammingDistance;
     private int manhattanDistance;
     private int[][]twinGrid;
-    private ArrayDeque<Board>neighborsQueue;
+    private ArrayDeque<Board>neighborsQueue = null;
     private ArrayList<int[][]>neighborsList;
 
     private int[][] copyBoard(int[][] blocks){
@@ -17,6 +17,7 @@ public class Board {
                 result[i][j] = blocks[i][j];
             }
         }
+        return result;
     }
 
     public Board(int[][] blocks) throws NullPointerException
@@ -39,10 +40,11 @@ public class Board {
         for(int i=0;i<N;i++){
             for(int j=0;j<N;j++){
                 twinGrid[i][j] = board[i][j];
+//                System.out.println(String.format("At (%d, %d) %d)", i, j, board[i][j]));
                 if(board[i][j] != 0){
                     int realY = board[i][j] % N;
                     int realX = board[i][j] / N;
-                    System.out.print(String.format("%d (%d %d)->(%d %d) ", board[i][j], i, j, realX, realY));
+//                    System.out.print(String.format("%d (%d %d)->(%d %d) ", board[i][j], i, j, realX, realY));
                     if(i != realX || j != realY){
                         hammingDistance ++;
                     }
@@ -58,33 +60,30 @@ public class Board {
                         swap2[1] = j;
                     }
                 }else{
+//                    System.out.println(String.format("\nCOMPUTING NEIGHBORS: %d, %d, %d", i, j, board[i][j]));
                     if(i + 1 < N){
-                        if(j + 1 < N){
-                            int[][] neighbor1 = copyBoard(board);
-                            neighbor1[i][j] = board[i+1][j+1];
-                            neighbor1[i+1][j+1] = board[i][j];
-                            neighborsList.add(neighbor1);
-                        }
-                        if(j - 1 >= 0){
-                            int[][] neighbor2 = copyBoard(board);
-                            neighbor2[i][j] = board[i+1][j-1];
-                            neighbor2[i+1][j-1] = board[i][j];
-                            neighborsList.add(neighbor2);
-                        }
+                        int[][] neighbor1 = copyBoard(board);
+                        neighbor1[i][j] = board[i+1][j];
+                        neighbor1[i+1][j] = board[i][j];
+                        neighborsList.add(neighbor1);
+                    }
+                    if(j + 1 < N){
+                        int[][] neighbor2 = copyBoard(board);
+                        neighbor2[i][j] = board[i][j+1];
+                        neighbor2[i][j+1] = board[i][j];
+                        neighborsList.add(neighbor2);
                     }
                     if(i - 1 >= 0){
-                        if(j + 1 < N){
-                            int[][] neighbor3 = copyBoard(board);
-                            neighbor3[i][j] = board[i-1][j+1];
-                            neighbor3[i-1][j+1] = board[i][j];
-                            neighborsList.add(neighbor3);
-                        }
-                        if(j - 1 >= 0){
-                            int[][] neighbor4 = copyBoard(board);
-                            neighbor4[i][j] = board[i-1][j-1];
-                            neighbor4[i-1][j-1] = board[i][j];
-                            neighborsList.add(neighbor4);
-                        }
+                        int[][] neighbor3 = copyBoard(board);
+                        neighbor3[i][j] = board[i-1][j];
+                        neighbor3[i-1][j] = board[i][j];
+                        neighborsList.add(neighbor3);
+                    }
+                    if(j - 1 >= 0){
+                        int[][] neighbor4 = copyBoard(board);
+                        neighbor4[i][j] = board[i][j-1];
+                        neighbor4[i][j-1] = board[i][j];
+                        neighborsList.add(neighbor4);
                     }
                 }
             }
@@ -149,7 +148,16 @@ public class Board {
 
     public Iterable<Board> neighbors()
     {
-        return neighborsQueue;
+        if(neighborsQueue != null){
+            return neighborsQueue;
+        }else{
+            neighborsQueue = new ArrayDeque<Board>();
+            for(int[][] grid : neighborsList){
+                neighborsQueue.add(new Board(grid));
+            }
+            return neighborsQueue;
+        }
+
     }
 
 
@@ -173,6 +181,8 @@ public class Board {
         System.out.println(testBoard.toString());
 //        System.out.println(testBoard.twin().toString());
 
-
+        for(Board neighbor : testBoard.neighbors()){
+            System.out.println(neighbor.toString());
+        }
     }
 }
