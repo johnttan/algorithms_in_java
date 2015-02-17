@@ -42,8 +42,8 @@ public class Board {
                 twinGrid[i][j] = board[i][j];
 //                System.out.println(String.format("At (%d, %d) %d)", i, j, board[i][j]));
                 if(board[i][j] != 0){
-                    int realY = board[i][j] % N;
-                    int realX = board[i][j] / N;
+                    int realY = (board[i][j]-1) % N;
+                    int realX = (board[i][j]-1) / N;
 //                    System.out.print(String.format("%d (%d %d)->(%d %d) ", board[i][j], i, j, realX, realY));
                     if(i != realX || j != realY){
                         hammingDistance ++;
@@ -184,5 +184,19 @@ public class Board {
         for(Board neighbor : testBoard.neighbors()){
             System.out.println(neighbor.toString());
         }
+
+        testGrid = new int[3][3];
+        for(int i=0;i<testGrid.length;i++){
+            for(int j=0;j<testGrid.length;j++){
+                testGrid[i][j] = (i * testGrid.length + j) + 1;
+                if(i == testGrid.length-1 && j == testGrid.length-1){
+                    testGrid[i][j] = 0;
+                }
+                System.out.print(testGrid[i][j]);
+            }
+            System.out.println("");
+        }
+        testBoard = new Board(testGrid);
+        StdOut.println(testBoard.isGoal());
     }
 }
