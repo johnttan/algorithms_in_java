@@ -7,7 +7,7 @@ public class Board {
     private int manhattanDistance;
     private int[][]twinGrid;
     private ArrayDeque<Board>neighborsQueue;
-    
+
 
     public Board(int[][] blocks) throws NullPointerException
     {
