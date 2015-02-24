@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 public class PointSET {
-    TreeSet<Point2D> storage;
+    private TreeSet<Point2D> storage;
 
     public PointSET(){
         storage = new TreeSet<Point2D>();
