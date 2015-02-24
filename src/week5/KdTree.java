@@ -78,15 +78,30 @@ public class KdTree {
         return sizeNum;
     }
 
-    private Node traverseInsert(Node node, Node newNode, Node parent){
+    private Node traverseInsert(Node node, Node newNode, Node parent, String side){
         if(node == null){
             newNode.setOppDirection(parent.direction());
+            RectHV rect;
+            if(side == "right"){
+                if(parent.direction() == "y"){
+                    rect = new RectHV(parent.getRect().xmin(), parent.point().y(), parent.getRect().xmax(), parent.getRect().ymax());
+                }else{
+                    rect = new RectHV(parent.point().x(), parent.getRect().ymin(), parent.getRect().xmax(), parent.getRect().ymax());
+                }
+            }else{
+                if(parent.direction() == "y"){
+                    rect = new RectHV(parent.getRect().xmin(), parent.getRect().ymin(), parent.getRect().xmax(), parent.point().y());
+                }else{
+                    rect = new RectHV(parent.getRect().xmin(), parent.getRect().ymin(), parent.point().x(), parent.getRect().ymax());
+                }
+            }
+            newNode.setRect(rect);
             return newNode;
         }
         if(node.compareTo(newNode) > 0) {
-            node.right = traverseInsert(node.right, newNode, node);
+            node.right = traverseInsert(node.right, newNode, node, "right");
         }else{
-           node.left = traverseInsert(node.left, newNode, node);
+           node.left = traverseInsert(node.left, newNode, node, "left");
         }
         return node;
     }
@@ -101,7 +116,7 @@ public class KdTree {
             root = newNode;
             return;
         }
-        traverseInsert(current, newNode, null);
+        traverseInsert(current, newNode, null, null);
         sizeNum ++;
     }
 
