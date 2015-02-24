@@ -73,7 +73,7 @@ public class KdTree {
     private int sizeNum;
 
     public KdTree(){
-
+        sizeNum = 0;
     }
 
     public boolean isEmpty(){
@@ -104,6 +104,9 @@ public class KdTree {
             newNode.setRect(rect);
             return newNode;
         }
+        if(node.point().compareTo(newNode.point()) == 0){
+            return node;
+        }
         if(node.compareTo(newNode) < 0) {
             node.right = traverseInsert(node.right, newNode, node, "right");
         }else{
@@ -120,6 +123,7 @@ public class KdTree {
             RectHV rect = new RectHV(0, 0, 1, 1);
             newNode.setRect(rect);
             root = newNode;
+            sizeNum ++;
             return;
         }
         traverseInsert(current, newNode, null, null);
