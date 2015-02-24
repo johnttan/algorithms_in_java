@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.TreeSet;
-
 public class KdTree {
 
     private class Node {
@@ -9,6 +6,8 @@ public class KdTree {
         private String directionStr;
         private Node right;
         private Node left;
+        private RectHV rect;
+
         public Node(Point2D point) {
             data = point;
             right = null;
@@ -54,6 +53,14 @@ public class KdTree {
                 directionStr = "y";
             }
         }
+
+        public void setRect(RectHV rectangle){
+            rect = rectangle;
+        }
+
+        public RectHV getRect(){
+            return rect;
+        }
     }
 
     private Node root;
@@ -71,36 +78,55 @@ public class KdTree {
         return sizeNum;
     }
 
-    private void traverseInsert(Node node, Node newNode){
-        if(node.compareTo(newNode) > 0) {
-            if(node.right == null){
-                node.right = newNode;
-                newNode.setOppDirection(node.direction());
-            }else{
-                traverseInsert(node.right, newNode);
-            }
-        }else{
-            if(node.left == null){
-                node.left = newNode;
-                newNode.setOppDirection(node.direction());
-            }else{
-                traverseInsert(node.left, newNode);
-            }
+    private Node traverseInsert(Node node, Node newNode, Node parent){
+        if(node == null){
+            newNode.setOppDirection(parent.direction());
+            return newNode;
         }
+        if(node.compareTo(newNode) > 0) {
+            node.right = traverseInsert(node.right, newNode, node);
+        }else{
+           node.left = traverseInsert(node.left, newNode, node);
+        }
+        return node;
     }
 
     public void insert(Point2D p){
         Node current = root;
         Node newNode = new Node(p);
-        newNode.setOppDirection("y");
         if(root == null){
+            newNode.setOppDirection("y");
+            RectHV rect = new RectHV(0, 0, 1, 1);
+            newNode.setRect(rect);
             root = newNode;
             return;
         }
-        traverseInsert(current, newNode);
+        traverseInsert(current, newNode, null);
+        sizeNum ++;
+    }
+
+    private boolean traverseContains(Node node, Node p){
+        if(node.point() == p.point()){
+            return true;
+        }
+        if(node.compareTo(p) > 0) {
+            if(node.right == null){
+                return false;
+            }else{
+                return traverseContains(node.right, p);
+            }
+        }else{
+            if(node.left == null){
+                return false;
+            }else{
+                return traverseContains(node.left, p);
+            }
+        }
     }
 
     public boolean contains(Point2D p){
+        Node wrappedPoint = new Node(p);
+        return traverseContains(root, wrappedPoint);
     }
 
     public void draw(){
