@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class KdTree {
 
     private class Node {
@@ -24,6 +26,10 @@ public class KdTree {
 
         public Point2D point(){
             return data;
+        }
+
+        public void setPoint(Point2D point){
+            data = point;
         }
 
         public void setRight(Node p){
@@ -98,7 +104,7 @@ public class KdTree {
             newNode.setRect(rect);
             return newNode;
         }
-        if(node.compareTo(newNode) > 0) {
+        if(node.compareTo(newNode) < 0) {
             node.right = traverseInsert(node.right, newNode, node, "right");
         }else{
            node.left = traverseInsert(node.left, newNode, node, "left");
@@ -124,7 +130,7 @@ public class KdTree {
         if(node.point() == p.point()){
             return true;
         }
-        if(node.compareTo(p) > 0) {
+        if(node.compareTo(p) < 0) {
             if(node.right == null){
                 return false;
             }else{
@@ -144,13 +150,62 @@ public class KdTree {
         return traverseContains(root, wrappedPoint);
     }
 
+    private void traverseDraw(Node node){
+        if(node == null){
+            return;
+        }
+
+        node.point().draw();
+        node.getRect().draw();
+
+        traverseDraw(node.right);
+        traverseDraw(node.left);
+    }
+
     public void draw(){
+        traverseDraw(root);
+    }
+
+    private void traverseRange(Node node, RectHV rect, ArrayList<Point2D> results){
+        if(rect.contains(node.point())){
+            results.add(node.point());
+        }
+        if(node.getRect().intersects(rect)){
+            traverseRange(node.right(), rect, results);
+            traverseRange(node.left(), rect, results);
+        }
     }
 
     public Iterable<Point2D> range(RectHV rect){
+        ArrayList<Point2D> results = new ArrayList<Point2D>();
+        traverseRange(root, rect, results);
+        return results;
+    }
+
+    private Node traverseNearest(Node node, Point2D p, Node closest){
+        if(node == null){
+            return closest;
+        }
+        if(node.getRect().distanceSquaredTo(p) > closest.point().distanceSquaredTo(p)){
+            return closest;
+        }
+
+        if(node.point().distanceSquaredTo(p) < closest.point().distanceSquaredTo(p)){
+            closest.setPoint(node.point());
+        }
+
+        if(node.point().compareTo(p) < 0){
+            traverseNearest(node.right, p, closest);
+            return traverseNearest(node.left, p, closest);
+        }else{
+            traverseNearest(node.left, p, closest);
+            return traverseNearest(node.right, p, closest);
+        }
     }
 
     public Point2D nearest(Point2D p) {
+        Node closestPoint = root;
+        return traverseNearest(root, p, closestPoint).point();
     }
 
     public static void main(String[] args){
