@@ -102,6 +102,7 @@ public class KdTree {
                 }
             }
             newNode.setRect(rect);
+            sizeNum ++;
             return newNode;
         }
         if(node.point().compareTo(newNode.point()) == 0){
@@ -115,7 +116,10 @@ public class KdTree {
         return node;
     }
 
-    public void insert(Point2D p){
+    public void insert(Point2D p) throws NullPointerException{
+        if(p == null){
+            throw new NullPointerException();
+        }
         Node current = root;
         Node newNode = new Node(p);
         if(root == null){
@@ -127,7 +131,6 @@ public class KdTree {
             return;
         }
         traverseInsert(current, newNode, null, null);
-        sizeNum ++;
     }
 
     private boolean traverseContains(Node node, Node p){
@@ -149,7 +152,10 @@ public class KdTree {
         }
     }
 
-    public boolean contains(Point2D p){
+    public boolean contains(Point2D p) throws NullPointerException{
+        if(p == null){
+            throw new NullPointerException();
+        }
         Node wrappedPoint = new Node(p);
         return traverseContains(root, wrappedPoint);
     }
@@ -183,7 +189,10 @@ public class KdTree {
         }
     }
 
-    public Iterable<Point2D> range(RectHV rect){
+    public Iterable<Point2D> range(RectHV rect) throws NullPointerException{
+        if(rect == null){
+            throw new NullPointerException();
+        }
         ArrayList<Point2D> results = new ArrayList<Point2D>();
         traverseRange(root, rect, results);
         return results;
@@ -210,8 +219,14 @@ public class KdTree {
         }
     }
 
-    public Point2D nearest(Point2D p) {
+    public Point2D nearest(Point2D p) throws NullPointerException{
+        if(p == null){
+            throw new NullPointerException();
+        }
         Node closestPoint = root;
+        if(root == null){
+            return null;
+        }
         return traverseNearest(root, p, closestPoint).point();
     }
 
