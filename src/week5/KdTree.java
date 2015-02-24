@@ -134,7 +134,7 @@ public class KdTree {
     }
 
     private boolean traverseContains(Node node, Node p){
-        if(node.point() == p.point()){
+        if(node.point().compareTo(p.point()) == 0){
             return true;
         }
         if(node.compareTo(p) < 0) {
@@ -155,6 +155,9 @@ public class KdTree {
     public boolean contains(Point2D p) throws NullPointerException{
         if(p == null){
             throw new NullPointerException();
+        }
+        if(root == null){
+            return false;
         }
         Node wrappedPoint = new Node(p);
         return traverseContains(root, wrappedPoint);
@@ -198,12 +201,12 @@ public class KdTree {
         return results;
     }
 
-    private Node traverseNearest(Node node, Point2D p, Node closest){
+    private void traverseNearest(Node node, Point2D p, Node closest){
         if(node == null){
-            return closest;
+            return;
         }
         if(node.getRect().distanceSquaredTo(p) > closest.point().distanceSquaredTo(p)){
-            return closest;
+            return;
         }
 
         if(node.point().distanceSquaredTo(p) < closest.point().distanceSquaredTo(p)){
@@ -212,10 +215,10 @@ public class KdTree {
 
         if(node.point().compareTo(p) < 0){
             traverseNearest(node.right, p, closest);
-            return traverseNearest(node.left, p, closest);
+            traverseNearest(node.left, p, closest);
         }else{
             traverseNearest(node.left, p, closest);
-            return traverseNearest(node.right, p, closest);
+            traverseNearest(node.right, p, closest);
         }
     }
 
@@ -223,11 +226,12 @@ public class KdTree {
         if(p == null){
             throw new NullPointerException();
         }
-        Node closestPoint = root;
         if(root == null){
             return null;
         }
-        return traverseNearest(root, p, closestPoint).point();
+        Node closestNode = new Node(root.point());
+        traverseNearest(root, p, closestNode);
+        return closestNode.point();
     }
 
     public static void main(String[] args){
