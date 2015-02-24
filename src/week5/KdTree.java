@@ -6,22 +6,25 @@ public class KdTree {
     private class Node {
         private Point2D data;
         //x || y
-        private String direction;
+        private String directionStr;
         private Node right;
         private Node left;
-        public Node(Point2D point, String dir) {
+        public Node(Point2D point) {
             data = point;
-            direction = dir;
             right = null;
             left = null;
         }
 
-        public double compareTo(Point2D that){
+        public double compareTo(Node that){
             if(direction.equals("y")){
-                return this.data.y() - that.y();
+                return point().y() - that.point().y();
             }else{
-                return this.data.x() - that.x();
+                return point().x() - that.point().x();
             }
+        }
+
+        public Point2D point(){
+            return data;
         }
 
         public void setRight(Node p){
@@ -39,7 +42,22 @@ public class KdTree {
         public Node left(){
             return left;
         }
+
+        public String direction(){
+            return directionStr;
+        }
+
+        public void setOppDirection(String dir){
+            if(dir == "y"){
+                directionStr = "x";
+            }else{
+                directionStr = "y";
+            }
+        }
     }
+
+    private Node root;
+    private int sizeNum;
 
     public KdTree(){
 
@@ -50,9 +68,36 @@ public class KdTree {
     }
 
     public int size(){
+        return sizeNum;
+    }
+
+    private void traverseInsert(Node node, Node newNode){
+        if(node.compareTo(newNode) > 0) {
+            if(node.right == null){
+                node.right = newNode;
+                newNode.setOppDirection(node.direction());
+            }else{
+                traverseInsert(node.right, newNode);
+            }
+        }else{
+            if(node.left == null){
+                node.left = newNode;
+                newNode.setOppDirection(node.direction());
+            }else{
+                traverseInsert(node.left, newNode);
+            }
+        }
     }
 
     public void insert(Point2D p){
+        Node current = root;
+        Node newNode = new Node(p);
+        newNode.setOppDirection("y");
+        if(root == null){
+            root = newNode;
+            return;
+        }
+        traverseInsert(current, newNode);
     }
 
     public boolean contains(Point2D p){
