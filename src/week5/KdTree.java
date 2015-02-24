@@ -17,7 +17,7 @@ public class KdTree {
         }
 
         public double compareTo(Node that){
-            if(direction.equals("y")){
+            if(directionStr.equals("y")){
                 return point().y() - that.point().y();
             }else{
                 return point().x() - that.point().x();
@@ -167,6 +167,9 @@ public class KdTree {
     }
 
     private void traverseRange(Node node, RectHV rect, ArrayList<Point2D> results){
+        if(node == null){
+            return;
+        }
         if(rect.contains(node.point())){
             results.add(node.point());
         }
