@@ -6,6 +6,7 @@
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Collection;
+import java.lang.Integer;
 /**
  *
  * @author johntan
@@ -20,43 +21,40 @@ public class WordNet {
             id = id;
             edges = new ArrayList<SynSet>();
         }
-        
-        public void addEdge (SynSet syn){
-            edges.add(syn);
-        }
     }
     private TreeMap<String, SynSet> nounIndex;
-    private TreeMap<String, SynSet> graph;
-    
+    private TreeMap<String, SynSet> graphIndex;
+    private Digraph graph;
     public WordNet (String synsets, String hypernyms) {
         nounIndex = new TreeMap<String, SynSet>();
-        graph = new <String, SynSet>TreeMap();
+        graphIndex = new <String, SynSet>TreeMap();
         
         In scanSyn;
         In scanHyper;
         scanSyn = new In(synsets);
         scanHyper = new In(hypernyms);
-
+        int countV = 0;
         while(scanSyn.hasNextLine()){
             String current = scanSyn.readLine();
             String[] splitCurrent = current.split(",");
             String[] nouns = splitCurrent[1].split(" ");
             SynSet syn = new SynSet(splitCurrent[0]);
 //            Put in Graph
-            graph.put(splitCurrent[0], syn);
+            graphIndex.put(splitCurrent[0], syn);
+            countV ++;
 //            Put in index that allows logn lookup of associated synsets via noun keys
             for(String noun : nouns) {
                 nounIndex.put(noun, syn);
             }
         }
+        graph = new Digraph(countV);
         
         while (scanHyper.hasNextLine()) {
             String current = scanSyn.readLine();
             String[] hypers = current.split(",");
-            SynSet currentSyn = graph.get(hypers[0]);
 //            Add associated hypernyms
             for(int i=1;i<hypers.length;i++){
-                currentSyn.addEdge(graph.get(hypers[i]));
+                graph.addEdge(Integer.parseInt(hypers[0]), Integer.parseInt(hypers[i]));
             }
         }
         
