@@ -50,7 +50,8 @@ function getDistance(nounA, nounB){
       red: false,
       secondVisit: false,
       startDist: Math.POSITIVE_INFINITY,
-      endDist: Math.POSITIVE_INFINITY
+      endDist: Math.POSITIVE_INFINITY,
+      ancestorCount: 0
     }
   }
   nounIndex[nounA].forEach(function(v){
@@ -87,6 +88,24 @@ function getDistance(nounA, nounB){
       }
     })
   };
+
+  for(var V in GraphStore){
+    for(var parent in Graph.getEdges(V)){
+      if(GraphStore[parent].red){
+        GraphStore[parent].ancestorCount = 1;
+      }
+    }
+  }
+  var minDist = Math.POSITIVE_INFINITY;
+  var minAncestor;
+  for(var V in GraphStore){
+    var path = GraphStore[V].endDist + GraphStore[V].startDist < minDist;
+    if(GraphStore[V].red && GraphStore[V].ancestorCount === 0 && path){
+      minAncestor = V;
+      minDist = path;
+    }
+  }
+  console.log(minAncestor, minDist);
 };
 
 loadGraph('wordnet/synsets.txt', 'wordnet/hypernyms.txt');
