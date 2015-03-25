@@ -5,6 +5,7 @@
  */
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.Collection;
 /**
  *
  * @author johntan
@@ -62,7 +63,8 @@ public class WordNet {
     }
     
     public Iterable<String> nouns() {
-        
+        Collection c = nounIndex.values();
+        return (Iterable<String>) c.iterator();
     }
     
     public boolean isNoun(String word) {
