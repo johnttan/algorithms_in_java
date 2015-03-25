@@ -17,23 +17,23 @@ import java.util.Hashtable;
 
 public class WordNet {
     private TreeMap<String, ArrayList<Integer>> nounIndex;
+    private Hashtable<Integer, String> synSets;
     private Digraph graph;
     private int countV;
     
     public WordNet (String synsets, String hypernyms) {
         nounIndex = new TreeMap<String, ArrayList<Integer>>();
+        synSets = new Hashtable<Integer, String>();
         
         In scanSyn;
         In scanHyper;
         scanSyn = new In(synsets);
         scanHyper = new In(hypernyms);
-        countV = 0;
-        int countNouns = 0;
         while(scanSyn.hasNextLine()){
             String current = scanSyn.readLine();
             String[] splitCurrent = current.split(",");
             String[] nouns = splitCurrent[1].split(" ");
-            countV ++;
+            synSets.put(Integer.parseInt(splitCurrent[0]), splitCurrent[1]);
 //            Put in index that allows logn lookup of associated synsets via noun keys
             for(String noun : nouns) {
                 if(!nounIndex.containsKey(noun)){
@@ -131,7 +131,6 @@ public class WordNet {
         
         for(int i=0;i<secondTable.length;i++){
             if(secondTable[i]){
-                System.out.println("secondtable true");
                 if(!countTable.contains(i)){
                     countTable.put(i, 0);
                 }
@@ -154,11 +153,98 @@ public class WordNet {
     }
     
     public String sap(String nounA, String nounB) {
-        
+        //        BFS over graph, keep lookup table of (id, distance) to keep track of min distance from nounA
+        int[] distanceStartTable = new int[countV];
+        int[] distanceEndTable = new int[countV];
+        boolean[] visitedTable = new boolean[countV];
+        boolean[] secondTable = new boolean[countV];
+        Hashtable<Integer, ArrayList<Integer>> parentTable;
+        Hashtable<Integer, Integer> countTable;
+
+        parentTable = new Hashtable<Integer, ArrayList<Integer>>();
+        countTable = new Hashtable<Integer, Integer>();
+
+        ArrayList<Integer> startVertices = nounIndex.get(nounA);
+        ArrayList<Integer> endVertices = nounIndex.get(nounB);
+
+        Queue<Integer> bfsQueue = new Queue<Integer>();
+
+        for (int i = 0; i < countV; i++) {
+            distanceStartTable[i] = Integer.MAX_VALUE;
+        }
+
+        for (int i = 0; i < countV; i++) {
+            distanceEndTable[i] = Integer.MAX_VALUE;
+        }
+
+        for (Integer v : startVertices) {
+            bfsQueue.enqueue(v);
+            visitedTable[v] = true;
+            distanceStartTable[v] = 0;
+        }
+
+        while (!bfsQueue.isEmpty()) {
+            Integer currentV = bfsQueue.dequeue();
+            for (Integer v : graph.adj(currentV)) {
+                distanceStartTable[v] = Math.min(distanceStartTable[v], distanceStartTable[currentV] + 1);
+                bfsQueue.enqueue(v);
+                visitedTable[v] = true;
+            }
+        }
+
+        for (Integer v : endVertices) {
+            bfsQueue.enqueue(v);
+            distanceEndTable[v] = 0;
+            if (!parentTable.contains(v)) {
+                parentTable.put(v, new ArrayList<Integer>());
+            }
+        }
+
+        while (!bfsQueue.isEmpty()) {
+            Integer currentV = bfsQueue.dequeue();
+
+            for (Integer v : graph.adj(currentV)) {
+//                Add list of parents for currentV if it has been marked
+                if (visitedTable[v]) {
+                    secondTable[v] = true;
+                }
+                if (!parentTable.contains(v)) {
+                    parentTable.put(v, new ArrayList<Integer>());
+                }
+                parentTable.get(currentV).add(v);
+                distanceEndTable[v] = Math.min(distanceEndTable[v], distanceEndTable[currentV] + 1);
+                bfsQueue.enqueue(v);
+            }
+
+        }
+
+        for (int i = 0; i < secondTable.length; i++) {
+            if (secondTable[i]) {
+                if (!countTable.contains(i)) {
+                    countTable.put(i, 0);
+                }
+                for (Integer parent : parentTable.get(i)) {
+                    countTable.put(parent, 1);
+                }
+            }
+        }
+
+        int ancestor = 0;
+        Enumeration keys = countTable.keys();
+
+        while (keys.hasMoreElements()) {
+            Integer key = (Integer) keys.nextElement();
+            if (countTable.get(key) == 0 && secondTable[key]) {
+                ancestor = key;
+            }
+        }
+        return synSets.get(ancestor);
     }
     
     public static void main (String[] args) {
         WordNet test = new WordNet("src/week7/wordnet/synsets.txt", "src/week7/wordnet/hypernyms.txt");
         System.out.println(test.distance("white_marlin", "mileage"));
+        System.out.println(test.distance("Black_Plague", "black_marlin"));
+        System.out.println(test.distance("American_water_spaniel", "histology"));
     }
 }
