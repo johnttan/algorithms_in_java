@@ -14,18 +14,19 @@ import java.lang.Integer;
 
 
 public class WordNet {
-    private TreeMap<String, Integer> nounIndex;
+    private TreeMap<String, ArrayList<Integer>> nounIndex;
     private Digraph graph;
     private int countV;
     
     public WordNet (String synsets, String hypernyms) {
-        nounIndex = new TreeMap<String, Integer>();
+        nounIndex = new TreeMap<String, ArrayList<Integer>>();
         
         In scanSyn;
         In scanHyper;
         scanSyn = new In(synsets);
         scanHyper = new In(hypernyms);
         countV = 0;
+        int countNouns = 0;
         while(scanSyn.hasNextLine()){
             String current = scanSyn.readLine();
             String[] splitCurrent = current.split(",");
@@ -33,7 +34,10 @@ public class WordNet {
             countV ++;
 //            Put in index that allows logn lookup of associated synsets via noun keys
             for(String noun : nouns) {
-                nounIndex.put(noun, Integer.parseInt(splitCurrent[0]));
+                if(!nounIndex.containsKey(noun)){
+                    nounIndex.put(noun, new ArrayList<Integer>());
+                }
+                nounIndex.get(noun).add(Integer.parseInt(splitCurrent[0]));
             }
         }
         graph = new Digraph(countV);
@@ -46,7 +50,6 @@ public class WordNet {
                 graph.addEdge(Integer.parseInt(hypers[0]), Integer.parseInt(hypers[i]));
             }
         }
-        
     }
     
     public Iterable<String> nouns() {
@@ -62,28 +65,35 @@ public class WordNet {
 //        BFS over graph, keep lookup table of (id, distance) to keep track of min distance from nounA
         int[] distanceTable = new int[countV];
         boolean[] visitedTable = new boolean[countV];
-        int startV = nounIndex.get(nounA);
-        int endV = nounIndex.get(nounB);
-        
-        distanceTable[startV] = 0;
-        
+        ArrayList<Integer> startVertices = nounIndex.get(nounA);
+        ArrayList<Integer> endVertices = nounIndex.get(nounB);
+        for(int i=0;i<countV;i++){
+            distanceTable[i] = Integer.MAX_VALUE;
+        }
         Queue<Integer> bfsQueue = new Queue<Integer>();
-        bfsQueue.enqueue(startV);
+        for(Integer v : startVertices){
+            bfsQueue.enqueue(v);
+            visitedTable[v] = true;
+            distanceTable[v] = 0;
+        }
         
         while(!bfsQueue.isEmpty()){
             Integer currentV = bfsQueue.dequeue();
+
             for(Integer v : graph.adj(currentV)){
                 if(!visitedTable[v]){
                     bfsQueue.enqueue(v);
-                    distanceTable[v] = distanceTable[currentV] + 1;
-                }
-                if(v == endV){
-                    return distanceTable[endV];
+                    visitedTable[v] = true;
+                    distanceTable[v] = Math.min(distanceTable[v], distanceTable[currentV] + 1);
                 }
             }
-            visitedTable[currentV] = true;
         }        
-        return distanceTable[endV];
+        Integer minDist = Integer.MAX_VALUE;
+        for(Integer v : endVertices){
+            System.out.println("ENDV" + distanceTable[v]);
+            minDist = Math.min(distanceTable[v], minDist);
+        }
+        return minDist;
     }
     
     public String sap(String nounA, String nounB) {
@@ -92,6 +102,6 @@ public class WordNet {
     
     public static void main (String[] args) {
         WordNet test = new WordNet("src/week7/wordnet/synsets.txt", "src/week7/wordnet/hypernyms.txt");
-        System.out.println(test);
+        System.out.println(test.distance("white_marlin", "mileage"));
     }
 }
