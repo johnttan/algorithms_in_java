@@ -65,35 +65,64 @@ public class WordNet {
 //        BFS over graph, keep lookup table of (id, distance) to keep track of min distance from nounA
         int[] distanceTable = new int[countV];
         boolean[] visitedTable = new boolean[countV];
+        boolean[] secondTable = new boolean[countV];
+        ArrayList<ArrayList<Integer>> parentTable;
+        ArrayList<Integer> countTable;
+        
+        parentTable = new ArrayList<ArrayList<Integer>>();
+        countTable = new ArrayList<Integer>();
+        
         ArrayList<Integer> startVertices = nounIndex.get(nounA);
         ArrayList<Integer> endVertices = nounIndex.get(nounB);
-        for(int i=0;i<countV;i++){
-            distanceTable[i] = Integer.MAX_VALUE;
-        }
+        
         Queue<Integer> bfsQueue = new Queue<Integer>();
+        
         for(Integer v : startVertices){
             bfsQueue.enqueue(v);
             visitedTable[v] = true;
-            distanceTable[v] = 0;
         }
         
         while(!bfsQueue.isEmpty()){
             Integer currentV = bfsQueue.dequeue();
 
             for(Integer v : graph.adj(currentV)){
-                if(!visitedTable[v]){
-                    bfsQueue.enqueue(v);
-                    visitedTable[v] = true;
-                    distanceTable[v] = Math.min(distanceTable[v], distanceTable[currentV] + 1);
-                }
+                bfsQueue.enqueue(v);
+                visitedTable[v] = true;
             }
         }        
-        Integer minDist = Integer.MAX_VALUE;
+        
         for(Integer v : endVertices){
-            System.out.println("ENDV" + distanceTable[v]);
-            minDist = Math.min(distanceTable[v], minDist);
+            bfsQueue.enqueue(v);
+            if(visitedTable[v]){
+                secondTable[v] = true;
+            }
         }
-        return minDist;
+        
+        while (!bfsQueue.isEmpty()) {
+            Integer currentV = bfsQueue.dequeue();
+
+            for (Integer v : graph.adj(currentV)) {
+//                Add list of parents for currentV
+                if(secondTable[currentV]){
+                    parentTable.get(currentV).add(v);
+                }
+                bfsQueue.enqueue(v);
+//                If it has been visited in traversal of start nodes, then mark it here
+                if(visitedTable[v]){
+                    secondTable[v] = true;
+                }
+            }
+        }
+        
+        for(int i=0;i<secondTable.length;i++){
+            if(secondTable[i]){
+                for(Integer parent : parentTable.get(i)){
+                    countTable.add(parent, 1);
+                }
+            }
+        }
+        
+        
     }
     
     public String sap(String nounA, String nounB) {
