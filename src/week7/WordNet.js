@@ -5,6 +5,7 @@ var Graph = {
   numEdges: 0,
   addEdge: function(v, w){
     this.store[v] = this.store[v] || [];
+    this.store[w] = this.store[w] || [];
     this.store[v].push(w);
     this.numEdges ++;
   },
@@ -41,36 +42,53 @@ function loadGraph(syns, hypers){
 
 function getDistance(nounA, nounB){
   var GraphStore = {};
-  var StartDist = {};
-  var EndDist = {};
 
   var dfsQ = [];
   for(var v in Graph.store){
     GraphStore[v] = GraphStore[current] || {
       blue: false,
-      red: false
+      red: false,
+      secondVisit: false,
+      startDist: Math.POSITIVE_INFINITY,
+      endDist: Math.POSITIVE_INFINITY
     }
-    StartDist[v] = Math.POSITIVE_INFINITY;
-    EndDist[v] = Math.POSITIVE_INFINITY;
   }
   nounIndex[nounA].forEach(function(v){
     dfsQ.push(v);
-    StartDist[v] = 0;
     GraphStore[v].blue = true;
+    GraphStore[v].startDist = 0;
   });
 
   while(dfsQ.length > 0){
-    var current = dfsQ.unshift();
+    var current = dfsQ.shift();
 
     Graph.getEdges(current).forEach(function(el){
-      if(!GraphStore[el].blue){
+      var V = GraphStore[el];
+      if(!V.blue){
         dfsQ.push(el);
-        GraphStore[el].blue = true;
-        StartDist[v] = Math.Min(StartDist[v], StartDist[current] + 1);
+        V.blue = true;
+        V.startDist = Math.min(V.startDist, GraphStore[current].startDist + 1);
       }
     })
-  }
+  };
+
+  while(dfsQ.length > 0){
+    var current = dfsQ.shift();
+
+    Graph.getEdges(current).forEach(function(el){
+      var V = GraphStore[el];
+      if(!V.secondVisit){
+        dfsQ.push(el);
+        V.secondVisit = true;
+        V.endDist = Math.min(V.endDist, GraphStore[current].endDist + 1);
+        if(V.blue){
+          V.red = true;
+        }
+      }
+    })
+  };
 };
 
 loadGraph('wordnet/synsets.txt', 'wordnet/hypernyms.txt');
+getDistance('mebibit', 'Ascension');
 
