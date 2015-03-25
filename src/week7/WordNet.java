@@ -141,16 +141,16 @@ public class WordNet {
             }
         }
         
-        int ancestor = 0;
+        int shortestPath = Integer.MAX_VALUE;
         Enumeration keys = countTable.keys();
         
         while(keys.hasMoreElements()){
             Integer key = (Integer) keys.nextElement();
-            if(countTable.get(key) == 0 && secondTable[key]){
-                ancestor = key;
+            if(countTable.get(key) == 0 && secondTable[key] && distanceEndTable[key] + distanceStartTable[key] < shortestPath){
+                shortestPath = distanceEndTable[key] + distanceStartTable[key];
             }
         }
-        return distanceEndTable[ancestor] + distanceStartTable[ancestor];
+        return shortestPath;
     }
     
     public String sap(String nounA, String nounB) {
@@ -230,12 +230,15 @@ public class WordNet {
             }
         }
 
+        int shortestPath = Integer.MAX_VALUE;
         int ancestor = 0;
         Enumeration keys = countTable.keys();
 
         while (keys.hasMoreElements()) {
             Integer key = (Integer) keys.nextElement();
-            if (countTable.get(key) == 0 && secondTable[key]) {
+//            Need to keep shortest ancestor
+            if (countTable.get(key) == 0 && secondTable[key] && distanceEndTable[key] + distanceStartTable[key] < shortestPath) {
+                shortestPath = distanceEndTable[key] + distanceStartTable[key];
                 ancestor = key;
             }
         }
@@ -247,5 +250,7 @@ public class WordNet {
         System.out.println(test.distance("white_marlin", "mileage"));
         System.out.println(test.distance("Black_Plague", "black_marlin"));
         System.out.println(test.distance("American_water_spaniel", "histology"));
+        System.out.println(test.sap("worm", "bird"));
+        System.out.println(test.sap("municipality", "region"));
     }
 }
