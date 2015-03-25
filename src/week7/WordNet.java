@@ -15,22 +15,22 @@ import java.util.Collection;
 public class WordNet {
     private class SynSet {
         private String id;
-        private ArrayList<String> edges;
+        private ArrayList<SynSet> edges;
         public SynSet (String id){
             id = id;
-            edges = new ArrayList<String>();
+            edges = new ArrayList<SynSet>();
         }
         
-        public void addEdge (String id){
-            edges.add(id);
+        public void addEdge (SynSet syn){
+            edges.add(syn);
         }
     }
-    private TreeMap nounIndex;
-    private TreeMap graph;
+    private TreeMap<String, SynSet> nounIndex;
+    private TreeMap<String, SynSet> graph;
     
     public WordNet (String synsets, String hypernyms) {
-        nounIndex = new TreeMap();
-        graph = new TreeMap();
+        nounIndex = new TreeMap<String, SynSet>();
+        graph = new <String, SynSet>TreeMap();
         
         In scanSyn;
         In scanHyper;
@@ -53,10 +53,10 @@ public class WordNet {
         while (scanHyper.hasNextLine()) {
             String current = scanSyn.readLine();
             String[] hypers = current.split(",");
-            SynSet currentSyn = (SynSet) graph.get(hypers[0]);
+            SynSet currentSyn = graph.get(hypers[0]);
 //            Add associated hypernyms
             for(int i=1;i<hypers.length;i++){
-                currentSyn.addEdge(hypers[i]);
+                currentSyn.addEdge(graph.get(hypers[i]));
             }
         }
         
@@ -68,7 +68,7 @@ public class WordNet {
     }
     
     public boolean isNoun(String word) {
-        
+        return nounIndex.containsKey(word);
     }
     
     public int distance(String nounA, String nounB) {
