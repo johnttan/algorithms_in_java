@@ -34,6 +34,7 @@ public class WordNet {
             String[] splitCurrent = current.split(",");
             String[] nouns = splitCurrent[1].split(" ");
             synSets.put(Integer.parseInt(splitCurrent[0]), splitCurrent[1]);
+            countV ++;
 //            Put in index that allows logn lookup of associated synsets via noun keys
             for(String noun : nouns) {
                 if(!nounIndex.containsKey(noun)){
