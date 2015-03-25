@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Collection;
 import java.lang.Integer;
+import java.util.Enumeration;
+import java.util.Hashtable;
 /**
  *
  * @author johntan
@@ -63,29 +65,39 @@ public class WordNet {
     
     public int distance(String nounA, String nounB) {
 //        BFS over graph, keep lookup table of (id, distance) to keep track of min distance from nounA
-        int[] distanceTable = new int[countV];
+        int[] distanceStartTable = new int[countV];
+        int[] distanceEndTable = new int[countV];
         boolean[] visitedTable = new boolean[countV];
         boolean[] secondTable = new boolean[countV];
-        ArrayList<ArrayList<Integer>> parentTable;
-        ArrayList<Integer> countTable;
+        Hashtable<Integer, ArrayList<Integer>> parentTable;
+        Hashtable<Integer, Integer> countTable;
         
-        parentTable = new ArrayList<ArrayList<Integer>>();
-        countTable = new ArrayList<Integer>();
+        parentTable = new Hashtable<Integer, ArrayList<Integer>>();
+        countTable = new Hashtable<Integer, Integer>();
         
         ArrayList<Integer> startVertices = nounIndex.get(nounA);
         ArrayList<Integer> endVertices = nounIndex.get(nounB);
         
         Queue<Integer> bfsQueue = new Queue<Integer>();
         
+        for(int i=0;i<countV;i++){
+            distanceStartTable[i] = Integer.MAX_VALUE;
+        }
+        
+        for (int i = 0; i < countV; i++) {
+            distanceEndTable[i] = Integer.MAX_VALUE;
+        }
+        
         for(Integer v : startVertices){
             bfsQueue.enqueue(v);
             visitedTable[v] = true;
+            distanceStartTable[v] = 0;
         }
         
         while(!bfsQueue.isEmpty()){
             Integer currentV = bfsQueue.dequeue();
-
             for(Integer v : graph.adj(currentV)){
+                distanceStartTable[v] = Math.min(distanceStartTable[v], distanceStartTable[currentV] + 1);
                 bfsQueue.enqueue(v);
                 visitedTable[v] = true;
             }
@@ -93,36 +105,52 @@ public class WordNet {
         
         for(Integer v : endVertices){
             bfsQueue.enqueue(v);
-            if(visitedTable[v]){
-                secondTable[v] = true;
+            distanceEndTable[v] = 0;
+            if (!parentTable.contains(v)) {
+                parentTable.put(v, new ArrayList<Integer>());
             }
         }
         
         while (!bfsQueue.isEmpty()) {
             Integer currentV = bfsQueue.dequeue();
-
+  
             for (Integer v : graph.adj(currentV)) {
-//                Add list of parents for currentV
-                if(secondTable[currentV]){
-                    parentTable.get(currentV).add(v);
-                }
-                bfsQueue.enqueue(v);
-//                If it has been visited in traversal of start nodes, then mark it here
-                if(visitedTable[v]){
+//                Add list of parents for currentV if it has been marked
+                if (visitedTable[v]) {
                     secondTable[v] = true;
                 }
+                if (!parentTable.contains(v)) {
+                    parentTable.put(v, new ArrayList<Integer>());
+                }
+                parentTable.get(currentV).add(v);
+                distanceEndTable[v] = Math.min(distanceEndTable[v], distanceEndTable[currentV] + 1);
+                bfsQueue.enqueue(v);
             }
+
         }
         
         for(int i=0;i<secondTable.length;i++){
             if(secondTable[i]){
+                System.out.println("secondtable true");
+                if(!countTable.contains(i)){
+                    countTable.put(i, 0);
+                }
                 for(Integer parent : parentTable.get(i)){
-                    countTable.add(parent, 1);
+                    countTable.put(parent, 1);
                 }
             }
         }
         
+        int ancestor = 0;
+        Enumeration keys = countTable.keys();
         
+        while(keys.hasMoreElements()){
+            Integer key = (Integer) keys.nextElement();
+            if(countTable.get(key) == 0 && secondTable[key]){
+                ancestor = key;
+            }
+        }
+        return distanceEndTable[ancestor] + distanceStartTable[ancestor];
     }
     
     public String sap(String nounA, String nounB) {
