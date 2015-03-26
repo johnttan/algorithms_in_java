@@ -48,17 +48,33 @@ public class WordNet {
             }
         }
         graph = new Digraph(countV);
-        DirectedCycle cycleCheck = new DirectedCycle(graph);
-        if(cycleCheck.hasCycle()){
-            throw new IllegalArgumentException();
+        int[] roots = new int[countV];
+        for(int i=0;i<roots.length;i++){
+            roots[i] = 0;
         }
         while (scanHyper.hasNextLine()) {
             String current = scanHyper.readLine();
             String[] hypers = current.split(",");
 //            Add associated hypernyms
+            if(hypers.length > 1){
+                roots[Integer.parseInt(hypers[0])] ++;
+            }
             for(int i=1;i<hypers.length;i++){
                 graph.addEdge(Integer.parseInt(hypers[0]), Integer.parseInt(hypers[i]));
             }
+        }
+        DirectedCycle cycleCheck = new DirectedCycle(graph);
+        if (cycleCheck.hasCycle()) {
+            throw new IllegalArgumentException();
+        }
+        int numRoots = 0;
+        for(int i=0;i<roots.length;i++){
+            if(roots[i] == 0){
+                numRoots ++;
+            }
+        }
+        if(numRoots > 1){
+            throw new IllegalArgumentException();
         }
         sapM = new SAP(graph);
     }
@@ -97,13 +113,14 @@ public class WordNet {
     }
     
     public static void main (String[] args) {
-        WordNet test = new WordNet("src/week7/wordnet/synsets.txt", "src/week7/wordnet/hypernyms.txt");
-        System.out.println(test.distance("white_marlin", "mileage"));
-        System.out.println(test.distance("Black_Plague", "black_marlin"));
-        System.out.println(test.distance("American_water_spaniel", "histology"));
-        System.out.println(test.sap("worm", "bird"));
-        System.out.println(test.distance("worm", "bird"));
-        System.out.println(test.sap("municipality", "region"));
-        System.out.println(test.distance("mebibit", "Ascension"));
+//        WordNet test = new WordNet("src/week7/wordnet/synsets.txt", "src/week7/wordnet/hypernyms.txt");
+//        System.out.println(test.distance("white_marlin", "mileage"));
+//        System.out.println(test.distance("Black_Plague", "black_marlin"));
+//        System.out.println(test.distance("American_water_spaniel", "histology"));
+//        System.out.println(test.sap("worm", "bird"));
+//        System.out.println(test.distance("worm", "bird"));
+//        System.out.println(test.sap("municipality", "region"));
+//        System.out.println(test.distance("mebibit", "Ascension"));
+//        WordNet testTwo = new WordNet("src/week7/wordnet/synsets3.txt", "src/week7/wordnet/hypernyms3InvalidCycle.txt");
     }
 }
