@@ -22,7 +22,10 @@ public class WordNet {
     private int countV;
     private SAP sapM;
     
-    public WordNet (String synsets, String hypernyms) {
+    public WordNet (String synsets, String hypernyms) throws NullPointerException, IllegalArgumentException {
+        if(synsets == null || hypernyms == null){
+            throw new NullPointerException();
+        }
         nounIndex = new TreeMap<String, ArrayList<Integer>>();
         synSets = new Hashtable<Integer, String>();
         
@@ -45,7 +48,10 @@ public class WordNet {
             }
         }
         graph = new Digraph(countV);
-        
+        DirectedCycle cycleCheck = new DirectedCycle(graph);
+        if(cycleCheck.hasCycle()){
+            throw new IllegalArgumentException();
+        }
         while (scanHyper.hasNextLine()) {
             String current = scanHyper.readLine();
             String[] hypers = current.split(",");
@@ -62,15 +68,30 @@ public class WordNet {
         return (Iterable<String>) c.iterator();
     }
     
-    public boolean isNoun(String word) {
+    public boolean isNoun(String word) throws NullPointerException {
+        if(word == null){
+            throw new NullPointerException();
+        }
         return nounIndex.containsKey(word);
     }
     
-    public int distance(String nounA, String nounB) {
+    public int distance(String nounA, String nounB) throws NullPointerException, IllegalArgumentException{
+        if(nounA == null || nounB == null){
+            throw new NullPointerException();
+        }
+        if(!isNoun(nounA) || !isNoun(nounB)){
+            throw new IllegalArgumentException();
+        }
         return sapM.length(nounIndex.get(nounA), nounIndex.get(nounB));
     }
     
-    public String sap(String nounA, String nounB) {
+    public String sap(String nounA, String nounB) throws NullPointerException, IllegalArgumentException{
+        if (nounA == null || nounB == null) {
+            throw new NullPointerException();
+        }
+        if (!isNoun(nounA) || !isNoun(nounB)) {
+            throw new IllegalArgumentException();
+        }
         int ind = sapM.ancestor(nounIndex.get(nounA), nounIndex.get(nounB));
         return synSets.get(ind);
     }

@@ -10,8 +10,15 @@
 public class SAP {
     private Digraph graph;
     
-    public SAP(Digraph G){
+    public SAP(Digraph G) throws NullPointerException, IllegalArgumentException {
+        if(G == null){
+            throw new NullPointerException();
+        }
         graph = new Digraph(G);
+        DirectedCycle cycleCheck = new DirectedCycle(graph);
+        if (cycleCheck.hasCycle()) {
+            throw new IllegalArgumentException();
+        }
     }
     
     public int length(int v, int w){
