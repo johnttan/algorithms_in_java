@@ -71,7 +71,8 @@ public class WordNet {
     }
     
     public String sap(String nounA, String nounB) {
-        return synSets.get(sapM.ancestor(nounIndex.get(nounA), nounIndex.get(nounB)));
+        int ind = sapM.ancestor(nounIndex.get(nounA), nounIndex.get(nounB));
+        return synSets.get(ind);
     }
     
     public static void main (String[] args) {
@@ -80,6 +81,7 @@ public class WordNet {
         System.out.println(test.distance("Black_Plague", "black_marlin"));
         System.out.println(test.distance("American_water_spaniel", "histology"));
         System.out.println(test.sap("worm", "bird"));
+        System.out.println(test.distance("worm", "bird"));
         System.out.println(test.sap("municipality", "region"));
         System.out.println(test.distance("mebibit", "Ascension"));
     }
