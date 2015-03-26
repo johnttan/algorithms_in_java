@@ -20,7 +20,7 @@ public class Outcast {
         if(nouns == null){
             throw new NullPointerException();
         }
-        String maxNoun;
+        String maxNoun = "";
         int maxSum = Integer.MIN_VALUE;
         for (String noun : nouns) {
             int sum = 0;
@@ -35,7 +35,11 @@ public class Outcast {
         return maxNoun;
     }
     
-    public static void main(String[] args){
-        
+    public static void main(String[] args) {
+        WordNet wordnet = new WordNet("src/week7/wordnet/synsets.txt", "src/week7/wordnet/hypernyms.txt");
+        Outcast outcast = new Outcast(wordnet);
+        In in = new In("src/week7/wordnet/outcast8.txt");
+        String[] nouns = in.readAllStrings();
+        StdOut.println("src/week7/wordnet/outcast8.txt" + ": " + outcast.outcast(nouns));
     }
 }
