@@ -252,5 +252,6 @@ public class WordNet {
         System.out.println(test.distance("American_water_spaniel", "histology"));
         System.out.println(test.sap("worm", "bird"));
         System.out.println(test.sap("municipality", "region"));
+        System.out.println(test.distance("mebibit", "Ascension"));
     }
 }

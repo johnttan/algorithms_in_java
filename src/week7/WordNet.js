@@ -130,7 +130,7 @@ function getDistance(nounA, nounB){
 
 loadGraph('wordnet/synsets.txt', 'wordnet/hypernyms.txt');
 getDistance('mebibit', 'Ascension');
-getDistance('white_marlin', 'mileage');
-getDistance('individual', 'edible_fruit');
-loadGraph('wordnet/synsets15.txt', 'wordnet/hypernyms15Path.txt');
-getDistance('a', 'b');
+// getDistance('white_marlin', 'mileage');
+// getDistance('individual', 'edible_fruit');
+// loadGraph('wordnet/synsets15.txt', 'wordnet/hypernyms15Path.txt');
+// getDistance('a', 'b');
