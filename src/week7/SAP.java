@@ -95,7 +95,7 @@ public class SAP {
         BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(graph, w);
 
         int minDist = Integer.MAX_VALUE;
-        int ancestor = 0;
+        int ancestor = -1;
         for (int i=0; i < graph.V(); i++) {
             if (bfsV.hasPathTo(i) && bfsW.hasPathTo(i)) {
                 int dist = bfsV.distTo(i) + bfsW.distTo(i);
