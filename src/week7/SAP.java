@@ -36,11 +36,14 @@ public class SAP {
         BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(graph, w);
 
         int minDist = Integer.MAX_VALUE;
-        int ancestor = 0;
+        int ancestor = -1;
         for (int i=0; i < graph.V(); i++) {
             if (bfsV.hasPathTo(i) && bfsW.hasPathTo(i)) {
-                minDist = Math.min(bfsV.distTo(i) + bfsW.distTo(i), minDist);
-                ancestor = i;
+                int dist = bfsV.distTo(i) + bfsW.distTo(i);
+                if(dist < minDist){
+                    ancestor = i;
+                    minDist = dist;
+                }
             }
         }
         return ancestor;
@@ -67,8 +70,11 @@ public class SAP {
         int ancestor = 0;
         for (int i=0; i < graph.V(); i++) {
             if (bfsV.hasPathTo(i) && bfsW.hasPathTo(i)) {
-                minDist = Math.min(bfsV.distTo(i) + bfsW.distTo(i), minDist);
-                ancestor = i;
+                int dist = bfsV.distTo(i) + bfsW.distTo(i);
+                if(dist < minDist){
+                    ancestor = i;
+                    minDist = dist;
+                }
             }
         }
         return ancestor;
