@@ -81,6 +81,7 @@ function getDistance(nounA, nounB){
       }
     })
   };
+  var parents = Object.create(null);
 
   nounIndex[nounB].forEach(function(v){
     dfsQ.push(v);
@@ -89,11 +90,11 @@ function getDistance(nounA, nounB){
       GraphStore[v].red = true;
     }
   });
-
   while(dfsQ.length > 0){
     var current = dfsQ.shift();
-
+    parents[current] = parents[current] || [];
     Graph.getEdges(current).forEach(function(el){
+      // parents[current].push(el);
       var V = GraphStore[el];
       if(!V.secondVisit){
         dfsQ.push(el);
@@ -101,29 +102,27 @@ function getDistance(nounA, nounB){
         V.endDist = Math.min(V.endDist, GraphStore[current].endDist + 1);
         if(V.blue){
           V.red = true;
+          // console.log('marking ancestor', Graph.getEdges(el)[i], el, GraphStore[el].red, GraphStore[el].blue);
+          GraphStore[el].ancestorCount ++;
         }
       }
     })
   };
 
-  for(var V in GraphStore){
-    for(var parent in Graph.getEdges(V)){
-      if(GraphStore[parent].red){
-        GraphStore[parent].ancestorCount = 1;
-      }
-    }
-  }
   var minDist = Number.POSITIVE_INFINITY;
   var minAncestor;
   for(var V in GraphStore){
     var path = GraphStore[V].endDist + GraphStore[V].startDist;
+    if(GraphStore[V].red){
+      // console.log(path, V, GraphStore[V], Graph.getEdges(V));
+    }
     if(GraphStore[V].red && GraphStore[V].ancestorCount === 0 && path < minDist){
       minAncestor = V;
       minDist = path;
     }
   }
   // console.log(Graph.getEdges(minAncestor), nounIndex['a'], nounIndex['b'], Graph.getEdges('0'), Graph.getEdges('1'));
-  console.log(minDist, minAncestor, synIndex[minAncestor]);
+  // console.log(minDist, minAncestor, synIndex[minAncestor]);
 
   return minDist;
 };

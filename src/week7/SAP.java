@@ -15,22 +15,65 @@ public class SAP {
     }
     
     public int length(int v, int w){
-        return 0;
+//        O(V + E);
+        BreadthFirstDirectedPaths bfsV = new BreadthFirstDirectedPaths(graph, v);
+//        O(V + E);
+        BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(graph, w);
+        
+        int minDist = Integer.MAX_VALUE;
+        for(int i=0;i<graph.V();i++){
+            if(bfsV.hasPathTo(i) && bfsW.hasPathTo(i)){
+                minDist = Math.min(bfsV.distTo(i) + bfsW.distTo(i), minDist);
+            }
+        }
+        return minDist;
     }
     
     public int ancestor(int v, int w){
-        return 0;
+        //        O(V + E);
+        BreadthFirstDirectedPaths bfsV = new BreadthFirstDirectedPaths(graph, v);
+//        O(V + E);
+        BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(graph, w);
+
+        int minDist = Integer.MAX_VALUE;
+        int ancestor = 0;
+        for (int i=0; i < graph.V(); i++) {
+            if (bfsV.hasPathTo(i) && bfsW.hasPathTo(i)) {
+                minDist = Math.min(bfsV.distTo(i) + bfsW.distTo(i), minDist);
+                ancestor = i;
+            }
+        }
+        return ancestor;
     }
     
     public int length(Iterable<Integer> v, Iterable<Integer> w){
-        return 0;
+        BreadthFirstDirectedPaths bfsV = new BreadthFirstDirectedPaths(graph, v);
+        BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(graph, w);
+
+        int minDist = Integer.MAX_VALUE;
+        for (int i=0; i < graph.V(); i++) {
+            if (bfsV.hasPathTo(i) && bfsW.hasPathTo(i)) {
+                minDist = Math.min(bfsV.distTo(i) + bfsW.distTo(i), minDist);
+            }
+        }
+        return minDist;
     }
     
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w){
-        return 0;
+        BreadthFirstDirectedPaths bfsV = new BreadthFirstDirectedPaths(graph, v);
+        BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(graph, w);
+
+        int minDist = Integer.MAX_VALUE;
+        int ancestor = 0;
+        for (int i=0; i < graph.V(); i++) {
+            if (bfsV.hasPathTo(i) && bfsW.hasPathTo(i)) {
+                minDist = Math.min(bfsV.distTo(i) + bfsW.distTo(i), minDist);
+                ancestor = i;
+            }
+        }
+        return ancestor;
     }
     
     public static void main(String[] args){
-        
     }
 }
