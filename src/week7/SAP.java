@@ -21,12 +21,18 @@ public class SAP {
         BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(graph, w);
         
         int minDist = Integer.MAX_VALUE;
+        boolean found = false;
         for(int i=0;i<graph.V();i++){
             if(bfsV.hasPathTo(i) && bfsW.hasPathTo(i)){
                 minDist = Math.min(bfsV.distTo(i) + bfsW.distTo(i), minDist);
+                found = true;
             }
         }
-        return minDist;
+        if(found){
+            return minDist;
+        }else{
+            return -1;
+        }
     }
     
     public int ancestor(int v, int w){
@@ -54,12 +60,20 @@ public class SAP {
         BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(graph, w);
 
         int minDist = Integer.MAX_VALUE;
+        boolean found = false;
+        
         for (int i=0; i < graph.V(); i++) {
             if (bfsV.hasPathTo(i) && bfsW.hasPathTo(i)) {
+                found = true;
                 minDist = Math.min(bfsV.distTo(i) + bfsW.distTo(i), minDist);
             }
         }
-        return minDist;
+        
+        if(found){
+            return minDist;
+        }else{
+            return -1;
+        }
     }
     
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w){
