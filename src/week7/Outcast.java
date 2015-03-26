@@ -16,7 +16,10 @@ public class Outcast {
         wordNet = wordnet;
     }
     
-    public String outcast(String[] nouns){
+    public String outcast(String[] nouns) throws NullPointerException{
+        if(nouns == null){
+            throw new NullPointerException();
+        }
         String maxNoun;
         int maxSum = Integer.MIN_VALUE;
         for (String noun : nouns) {

@@ -21,7 +21,8 @@ public class SAP {
         }
     }
     
-    public int length(int v, int w){
+    public int length(int v, int w) {
+
 //        O(V + E);
         BreadthFirstDirectedPaths bfsV = new BreadthFirstDirectedPaths(graph, v);
 //        O(V + E);
@@ -42,7 +43,7 @@ public class SAP {
         }
     }
     
-    public int ancestor(int v, int w){
+    public int ancestor(int v, int w) {
         //        O(V + E);
         BreadthFirstDirectedPaths bfsV = new BreadthFirstDirectedPaths(graph, v);
 //        O(V + E);
@@ -62,7 +63,10 @@ public class SAP {
         return ancestor;
     }
     
-    public int length(Iterable<Integer> v, Iterable<Integer> w){
+    public int length(Iterable<Integer> v, Iterable<Integer> w) throws NullPointerException{
+        if(v == null || w == null){
+            throw new NullPointerException();
+        }
         BreadthFirstDirectedPaths bfsV = new BreadthFirstDirectedPaths(graph, v);
         BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(graph, w);
 
@@ -83,7 +87,10 @@ public class SAP {
         }
     }
     
-    public int ancestor(Iterable<Integer> v, Iterable<Integer> w){
+    public int ancestor(Iterable<Integer> v, Iterable<Integer> w) throws NullPointerException{
+        if(v == null || w == null){
+            throw new NullPointerException();
+        }
         BreadthFirstDirectedPaths bfsV = new BreadthFirstDirectedPaths(graph, v);
         BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(graph, w);
 
