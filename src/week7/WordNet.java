@@ -16,7 +16,7 @@ import java.util.Hashtable;
 
 
 public class WordNet {
-    private TreeMap<String, ArrayList<Integer>> nounIndex;
+    private Hashtable<String, ArrayList<Integer>> nounIndex;
     private Hashtable<Integer, String> synSets;
     private Digraph graph;
     private int countV;
@@ -26,7 +26,7 @@ public class WordNet {
         if(synsets == null || hypernyms == null){
             throw new NullPointerException();
         }
-        nounIndex = new TreeMap<String, ArrayList<Integer>>();
+        nounIndex = new Hashtable<String, ArrayList<Integer>>();
         synSets = new Hashtable<Integer, String>();
         
         In scanSyn;
@@ -80,8 +80,7 @@ public class WordNet {
     }
     
     public Iterable<String> nouns() {
-        Collection c = nounIndex.values();
-        return (Iterable<String>) c.iterator();
+        return nounIndex.keySet();
     }
     
     public boolean isNoun(String word) throws NullPointerException {
@@ -115,6 +114,9 @@ public class WordNet {
     public static void main (String[] args) {
 //        WordNet test = new WordNet("src/week7/wordnet/synsets.txt", "src/week7/wordnet/hypernyms.txt");
 //        System.out.println(test.distance("white_marlin", "mileage"));
+//        for(String noun : test.nouns()){
+//            System.out.println(noun);
+//        }
 //        System.out.println(test.distance("Black_Plague", "black_marlin"));
 //        System.out.println(test.distance("American_water_spaniel", "histology"));
 //        System.out.println(test.sap("worm", "bird"));
