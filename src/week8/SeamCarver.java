@@ -12,7 +12,9 @@ import java.awt.Color;
  */
 public class SeamCarver {
     private Picture pic;
-    private int[][] energyGrid;
+    private double[][] energyGrid;
+    private EdgeWeightedDigraph graph;
+    private Topological topo;
     
     private double[][] generateEnergy(Picture picture){
         double[][] grid = new double[picture.width()][picture.height()];
@@ -49,14 +51,40 @@ public class SeamCarver {
                 }else{
                     double xSum = Math.pow(right.getBlue() - left.getBlue(), 2) + Math.pow(right.getGreen() - left.getGreen(), 2) + Math.pow(left.getRed() - left.getRed(), 2);
                     double ySum = Math.pow(bottom.getBlue() - top.getBlue(), 2) + Math.pow(bottom.getGreen() - top.getGreen(), 2) + Math.pow(bottom.getRed() - top.getRed(), 2);
+                    grid[x][y] = xSum + ySum;
                 }
             }
         }
+        return grid;
+    }
+    
+    private void generateGridAndGraph(Picture picture){
+        energyGrid = generateEnergy(picture);
+        graph = new EdgeWeightedDigraph(picture.height() * picture.width());
+        for (int y = 0; y < energyGrid[0].length - 1; y++) {
+            for (int x = 0; x < energyGrid.length; x++) {
+                int currentV = x + y * energyGrid[0].length;
+//                Add left node
+                if (x > 0) {
+                    DirectedEdge edge = new DirectedEdge(currentV, x - 1 + (y + 1) * energyGrid[0].length, energyGrid[x - 1][y + 1]);
+                    graph.addEdge(edge);
+                }
+//                Add right node
+                if (x < energyGrid.length - 1) {
+                    DirectedEdge edge = new DirectedEdge(currentV, x + 1 + (y + 1) * energyGrid[0].length, energyGrid[x + 1][y + 1]);
+                    graph.addEdge(edge);
+                }
+//                Add center node
+                DirectedEdge edge = new DirectedEdge(currentV, x + 1 + (y + 1) * energyGrid[0].length, energyGrid[x + 1][y + 1]);
+                graph.addEdge(edge);
+            }
+        }
+        topo = new Topological(graph);
     }
     
     public SeamCarver(Picture picture){
         pic = picture;
-        energyGrid = generateEnergy(picture);
+        generateGridAndGraph(picture);
     }
     
     public Picture picture(){
@@ -88,6 +116,10 @@ public class SeamCarver {
     }
     
     public void removeVerticalSeam(int[] seam){
+        
+    }
+    
+    public static void main(String[] args){
         
     }
 }
