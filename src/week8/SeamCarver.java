@@ -1,3 +1,6 @@
+
+import java.awt.Color;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -11,12 +14,42 @@ public class SeamCarver {
     private Picture pic;
     private int[][] energyGrid;
     
-    private int[][] generateEnergy(Picture picture){
-        int[][] grid = new int[picture.width()][picture.height()];
+    private double[][] generateEnergy(Picture picture){
+        double[][] grid = new double[picture.width()][picture.height()];
         
         for(int x=0;x<grid.length;x++){
             for(int y=0;y<grid[0].length;y++){
-                
+                Color left;
+                Color right;
+                Color top;
+                Color bottom;
+                boolean edge = false;
+                try{
+                    left = picture.get(x-1, y);
+                }catch(IndexOutOfBoundsException e){
+                    edge = true;
+                }
+                try {
+                    right = picture.get(x+1, y);
+                } catch (IndexOutOfBoundsException e) {
+                    edge = true;
+                }
+                try {
+                    top = picture.get(x, y-1);
+                } catch (IndexOutOfBoundsException e) {
+                    edge = true;
+                }
+                try {
+                    bottom = picture.get(x, y+1);
+                } catch (IndexOutOfBoundsException e) {
+                    edge = true;
+                }
+                if(edge){
+                    grid[x][y] = 195075;
+                }else{
+                    double xSum = Math.pow(right.getBlue() - left.getBlue(), 2) + Math.pow(right.getGreen() - left.getGreen(), 2) + Math.pow(left.getRed() - left.getRed(), 2);
+                    double ySum = Math.pow(bottom.getBlue() - top.getBlue(), 2) + Math.pow(bottom.getGreen() - top.getGreen(), 2) + Math.pow(bottom.getRed() - top.getRed(), 2);
+                }
             }
         }
     }
