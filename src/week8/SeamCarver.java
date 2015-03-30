@@ -13,8 +13,8 @@ import java.awt.Color;
 public class SeamCarver {
     private Picture pic;
     private double[][] energyGrid;
-    private EdgeWeightedDigraph graph;
-    private Topological topo;
+    private Topological verticalTopo;
+    private Topological horizontalTopo;
     
     private double[][] generateEnergy(Picture picture){
         double[][] grid = new double[picture.width()][picture.height()];
@@ -60,26 +60,47 @@ public class SeamCarver {
     
     private void generateGridAndGraph(Picture picture){
         energyGrid = generateEnergy(picture);
-        graph = new EdgeWeightedDigraph(picture.height() * picture.width());
+        EdgeWeightedDigraph verticalGraph = new EdgeWeightedDigraph(picture.height() * picture.width());
         for (int y = 0; y < energyGrid[0].length - 1; y++) {
             for (int x = 0; x < energyGrid.length; x++) {
                 int currentV = x + y * energyGrid[0].length;
 //                Add left node
                 if (x > 0) {
                     DirectedEdge edge = new DirectedEdge(currentV, x - 1 + (y + 1) * energyGrid[0].length, energyGrid[x - 1][y + 1]);
-                    graph.addEdge(edge);
+                    verticalGraph.addEdge(edge);
                 }
 //                Add right node
                 if (x < energyGrid.length - 1) {
                     DirectedEdge edge = new DirectedEdge(currentV, x + 1 + (y + 1) * energyGrid[0].length, energyGrid[x + 1][y + 1]);
-                    graph.addEdge(edge);
+                    verticalGraph.addEdge(edge);
                 }
 //                Add center node
                 DirectedEdge edge = new DirectedEdge(currentV, x + 1 + (y + 1) * energyGrid[0].length, energyGrid[x + 1][y + 1]);
-                graph.addEdge(edge);
+                verticalGraph.addEdge(edge);
             }
         }
-        topo = new Topological(graph);
+        verticalTopo = new Topological(verticalGraph);
+        
+        EdgeWeightedDigraph horizontalGraph = new EdgeWeightedDigraph(picture.height() * picture.width());
+        for( int x = 0; x < energyGrid.length - 1; x++){
+            for (int y=0; y < energyGrid.length; y++){
+                int currentV = x + y * energyGrid[0].length;
+                
+                if(y > 0){
+                    DirectedEdge edge = new DirectedEdge(currentV, x + 1 + (y - 1) * energyGrid[0].length, energyGrid[x + 1][y - 1]);
+                    horizontalGraph.addEdge(edge);
+                }
+                
+                if(y < energyGrid[0].length - 1){
+                    DirectedEdge edge = new DirectedEdge(currentV, x + 1 + (y + 1) * energyGrid[0].length, energyGrid[x + 1][y + 1]);
+                    horizontalGraph.addEdge(edge);
+                }
+                
+                DirectedEdge edge = new DirectedEdge(currentV, x + 1 + (y) * energyGrid[0].length, energyGrid[x + 1][y]);
+                horizontalGraph.addEdge(edge);
+            }
+        }
+        horizontalTopo = new Topological(horizontalGraph);
     }
     
     public SeamCarver(Picture picture){
@@ -100,7 +121,7 @@ public class SeamCarver {
     }
     
     public double energy(int x, int y){
-        
+        return energyGrid[x][y];
     }
     
     public int[] findHorizontalSeam(){
