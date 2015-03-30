@@ -17,10 +17,10 @@ public class SeamCarver {
     private Topological horizontalTopo;
     
     private double getEnergy(Picture picture, int x, int y){
-        Color left;
-        Color right;
-        Color top;
-        Color bottom;
+        Color left = new Color(0);
+        Color right = new Color(0);
+        Color top = new Color(0);
+        Color bottom = new Color(0);
         boolean edge = false;
         try {
             left = picture.get(x - 1, y);
@@ -62,13 +62,9 @@ public class SeamCarver {
         return grid;
     }
     
-    private void generateGridAndGraph(Picture picture){
-        energyGrid = generateEnergy(picture);
-    }
-    
     public SeamCarver(Picture picture){
         pic = picture;
-        generateGridAndGraph(picture);
+        energyGrid = generateEnergy(pic);
     }
     
     public Picture picture(){
@@ -86,8 +82,24 @@ public class SeamCarver {
     public double energy(int x, int y){
         return energyGrid[x][y];
     }
-    
+    private int nodeID(int x, int y){
+        return x + y * pic.height();
+    }
     public int[] findHorizontalSeam(){
+        int[] results = new int[pic.width()];
+        double[] dist = new double[pic.width() * pic.height()];
+        int[] parentEdge = new int[pic.width() * pic.height()];
+        
+        for(int y=0;y<pic.height();y++){
+            dist[nodeID(0, y)] = 0;   
+            parentEdge[nodeID(0, y)] = -1;
+        }
+        for(int x=0;x<pic.width()-1;x++){
+            for(int y=0;y<pic.height();y++){
+                dist[nodeID(x, y)] = Double.MAX_VALUE;
+            }
+        }
+        
         return new int[0];
     }
     
