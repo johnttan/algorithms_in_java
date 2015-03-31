@@ -114,7 +114,6 @@ public class SeamCarver {
             int current = (int) dfsStack.pop();
             int[] coord = idToCoord(current);
             double currentNodeDist = dist[current];
-            System.out.println("CURRENT DIST " + dist[current] + " " + current);
 
             if(coord[0] < pic.width()-1){
                 if (coord[1] > 0) {
@@ -150,18 +149,20 @@ public class SeamCarver {
         
         for(int i=0;i<pic.height();i++){
             int node = nodeID(pic.width()-1, i);
-
-            if(dist[node] > maxDist){
+            if(dist[node] < maxDist){
                 maxDist = dist[node];
                 maxNode = node;
             }
         }
         int count = results.length-1;
-        results[count] = maxNode;
+        int[] coord = idToCoord(maxNode);
+        results[count] = coord[1];
         count --;
-        while(maxNode > 0){
+        while(count >= 0){
             maxNode = parentEdge[maxNode];
-            results[count] = maxNode;
+            int[] cd = idToCoord(maxNode);
+
+            results[count] = cd[1];
             count--;
         }
         
