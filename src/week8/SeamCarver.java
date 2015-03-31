@@ -47,10 +47,8 @@ public class SeamCarver {
         if (edge) {
             return 195075;
         } else {
-            double xSum = Math.pow(right.getBlue() - left.getBlue(), 2) + Math.pow(right.getGreen() - left.getGreen(), 2) + Math.pow(left.getRed() - left.getRed(), 2);
+            double xSum = Math.pow(right.getBlue() - left.getBlue(), 2) + Math.pow(right.getGreen() - left.getGreen(), 2) + Math.pow(right.getRed() - left.getRed(), 2);
             double ySum = Math.pow(bottom.getBlue() - top.getBlue(), 2) + Math.pow(bottom.getGreen() - top.getGreen(), 2) + Math.pow(bottom.getRed() - top.getRed(), 2);
-            System.out.println("ENERGIES ");
-            System.out.print(xSum + ySum);
             return xSum + ySum;
         }
     }
@@ -68,16 +66,12 @@ public class SeamCarver {
     
     private Picture transposeImage(Picture pic){
         Picture picture = new Picture(pic.height(), pic.width());
-        if(rightSide){
-            for(int x=0;x<pic.width();x++){
-                for(int y=0;y<pic.height();y++){
-                    picture.set(pic.height() -1 - y, x, pic.get(x, y));
-                }
-            }
-        }else{
-            for(int x=0;x<pic.width();x++){
-                for(int y=0;y<pic.height();y++){
-                    picture.set(y, picture.width()-1-x, pic.get(x, y));
+        for(int x=0;x<pic.width();x++){
+            for(int y=0;y<pic.height();y++){
+                if(rightSide){
+                    picture.set(pic.height() - 1 - y, x, pic.get(x, y));
+                }else{
+                    picture.set(y, picture.width() - 1 - x, pic.get(x, y));
                 }
             }
         }
@@ -219,11 +213,48 @@ public class SeamCarver {
     }
     
     public void removeHorizontalSeam(int[] seam){
-        
+        Picture newPic = new Picture(pic.width(), pic.height() - 1);
+        for(int x=0;x<pic.width();x++){
+            int diff = 0;
+
+            for(int y=0;y<pic.height();y++){
+                if(y == seam[x]){
+                    diff = 1;
+                }else{
+                    newPic.set(x, y-diff, pic.get(x, y));
+                }
+            }
+        }
+        pic = newPic;
+        if(!rightSide){
+            tempPic = new Picture(transposeImage(pic));
+
+        }else{
+            tempPic = new Picture(pic);
+            tempEnergyGrid = generateEnergy(tempPic);
+        }
     }
     
     public void removeVerticalSeam(int[] seam){
-        
+        Picture newPic = new Picture(pic.width()-1, pic.height());
+        for (int y = 0; y < pic.height(); y++) {
+            int diff = 0;
+            for (int x = 0; x < pic.width(); x++) {
+                if (x == seam[y]) {
+                    diff = 1;
+                } else {
+                    newPic.set(x-diff, y, pic.get(x, y));
+                }
+            }
+        }
+        pic = newPic;
+        if (!rightSide) {
+            System.out.println("dimensions" + pic.width() + ", " + pic.height());
+            tempPic = new Picture(transposeImage(pic));
+        } else {
+            tempPic = new Picture(pic);
+            tempEnergyGrid = generateEnergy(tempPic);
+        }
     }
     
     public static void main(String[] args){
