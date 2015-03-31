@@ -18,11 +18,17 @@ public class SeamCarver {
     Queue<Removal> removalQueue;
     
     private class Removal{
-        public int[] seam;
-        public boolean vertical;
-        public Removal(int[] seam, boolean vertical){
-            seam = seam;
-            vertical = vertical;
+        private int[] seam;
+        private boolean vertical;
+        public Removal(int[] seamA, boolean vert){
+            seam = seamA;
+            vertical = vert;
+        }
+        public int[] getSeam(){
+            return seam;
+        }
+        public boolean getVertical(){
+            return vertical;
         }
     }
     
@@ -84,10 +90,54 @@ public class SeamCarver {
     }
     
     public Picture picture(){
-        pic = new Picture(energyGrid.length, energyGrid[0].length);
-        for(int x=0;x<energyGrid.length;x++){
-            for(int y=0;y<energyGrid[0].length;y++){
-                pic.set(x, y, energyGrid[x][y]);
+        if(removalQueue.isEmpty()){
+            return pic;
+        }
+        Color[][] tempPic = new Color[pic.width()][pic.height()];
+//        Make copy of pic into Color array
+        for(int x=0;x<tempPic.length;x++){
+            for(int y=0;y<tempPic[0].length;y++){
+                tempPic[x][y] = pic.get(x, y);
+            }
+        }
+        Color[][] newTempPic = tempPic;
+        while(!removalQueue.isEmpty()){
+            Removal current = removalQueue.dequeue();
+            int xMax = tempPic.length;
+            int yMax = tempPic[0].length;
+            if(current.getVertical()){
+                newTempPic = new Color[tempPic.length -1][tempPic[0].length];
+                for (int y = 0; y < yMax; y++) {
+                    int diff = 0;
+                    for (int x = 0; x < xMax; x++) {
+                        if (x == current.getSeam()[y]) {
+                            diff = 1;
+                        } else {
+                            newTempPic[x - diff][y] = tempPic[x][y];
+                        }
+                    }
+                }
+                tempPic = newTempPic;
+            }else{
+                newTempPic = new Color[tempPic.length][tempPic[0].length-1];
+                for (int x = 0; x < xMax; x++) {
+                    int diff = 0;
+                    for (int y = 0; y < yMax; y++) {
+                        if (y == current.getSeam()[x]) {
+                            diff = 1;
+                        } else {
+                            newTempPic[x][y - diff] = tempPic[x][y];
+                        }
+                    }
+                }
+                tempPic = newTempPic;
+            }
+        }
+        
+        pic = new Picture(newTempPic.length, newTempPic[0].length);
+        for(int x=0;x<newTempPic.length;x++){
+            for(int y=0;y<newTempPic[0].length;y++){
+                pic.set(x, y, newTempPic[x][y]);
             }
         }
         return pic;
