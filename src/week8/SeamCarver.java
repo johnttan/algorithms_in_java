@@ -122,13 +122,14 @@ public class SeamCarver {
         int[] results = new int[tempPic.width()];
         double[] dist = new double[tempPic.width() * tempPic.height()];
         int[] parentEdge = new int[tempPic.width() * tempPic.height()];
+        boolean[] visited = new boolean[tempPic.width() * tempPic.height()];
         Queue bfsQueue = new Queue();
         for(int y=0;y<tempPic.height();y++){
             int currentV = nodeID(0, y);
             dist[currentV] = 0;   
             parentEdge[currentV] = -1;
             bfsQueue.enqueue(currentV);
-
+            visited[currentV] = true;
         }
         for(int x=1;x<tempPic.width();x++){
             for(int y=0;y<tempPic.height();y++){
@@ -144,30 +145,42 @@ public class SeamCarver {
             if(coord[0] < tempPic.width()-1){
                 if (coord[1] > 0) {
 //                    Relax top node
-                    double oldDist = dist[nodeID(coord[0] + 1, coord[1] - 1)];
+                    int node = nodeID(coord[0] + 1, coord[1] - 1);
+                    double oldDist = dist[node];
                     double newDist = currentNodeDist + tempEnergyGrid[coord[0]+1][coord[1]-1];
                     if(oldDist > newDist){
-                        dist[nodeID(coord[0]+1, coord[1]-1)] = newDist;
-                        parentEdge[nodeID(coord[0]+1, coord[1]-1)] = current;
+                        dist[node] = newDist;
+                        parentEdge[node] = current;
                     }
-                    bfsQueue.enqueue(nodeID(coord[0] + 1, coord[1] - 1));
+                    if(!visited[node]){
+                        bfsQueue.enqueue(node);
+                        visited[node] = true;
+                    }
                 }
                 if (coord[1] < tempPic.height() - 1) {
-                    double oldDist = dist[nodeID(coord[0] + 1, coord[1] + 1)];
+                    int node = nodeID(coord[0] + 1, coord[1] + 1);
+                    double oldDist = dist[node];
                     double newDist = currentNodeDist + tempEnergyGrid[coord[0] + 1][coord[1] + 1];
                     if (oldDist > newDist) {
-                        dist[nodeID(coord[0] + 1, coord[1] + 1)] = newDist;
-                        parentEdge[nodeID(coord[0] + 1, coord[1] + 1)] = current;
+                        dist[node] = newDist;
+                        parentEdge[node] = current;
                     }
-                    bfsQueue.enqueue(nodeID(coord[0] + 1, coord[1] + 1));
+                    if(!visited[node]){
+                        visited[node] = true;
+                        bfsQueue.enqueue(node);
+                    }
                 }
-                double oldDist = dist[nodeID(coord[0] + 1, coord[1])];
+                int node = nodeID(coord[0] + 1, coord[1]);
+                double oldDist = dist[node];
                 double newDist = currentNodeDist + tempEnergyGrid[coord[0] + 1][coord[1]];
                 if (oldDist > newDist) {
-                    dist[nodeID(coord[0] + 1, coord[1])] = newDist;
-                    parentEdge[nodeID(coord[0] + 1, coord[1])] = current;
+                    dist[node] = newDist;
+                    parentEdge[node] = current;
                 }
-                bfsQueue.enqueue(nodeID(coord[0] +1, coord[1]));
+                if(!visited[node]){
+                    bfsQueue.enqueue(nodeID(coord[0] + 1, coord[1]));
+                    visited[node] = true;
+                }
             }
         }
         int maxNode = 0;
