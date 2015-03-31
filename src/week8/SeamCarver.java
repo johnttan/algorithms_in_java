@@ -120,7 +120,7 @@ public class SeamCarver {
         int[] results = new int[pic.width()];
         double[] dist = new double[pic.width() * pic.height()];
         int[] parentEdge = new int[pic.width() * pic.height()];
-        Queue bfQueue = new Queue();
+        Queue bfsQueue = new Queue();
         for(int y=0;y<pic.height();y++){
             int currentV = nodeID(0, y);
             dist[currentV] = 0;   
