@@ -11,12 +11,11 @@ import java.awt.Color;
  * @author johntan
  */
 public class SeamCarver {
-    private Picture pic;
     private double[][] energyGrid;
     private int width;
     private int height;
     private Queue<Removal> removalQueue;
-    private Color[][] tempPic;
+    private int[][][] tempPic;
     private class Removal{
         private int[] seam;
         private boolean vertical;
@@ -32,11 +31,11 @@ public class SeamCarver {
         }
     }
     
-    private double getEnergy(Color[][] picture, int x, int y){
-        Color left = new Color(0);
-        Color right = new Color(0);
-        Color top = new Color(0);
-        Color bottom = new Color(0);
+    private double getEnergy(int[][][] picture, int x, int y){
+        int[] left = new int[3];
+        int[] right = new int[3];
+        int[] top = new int[3];
+        int[] bottom = new int[3];
 
         if(x < 1 || x > picture.length-2 || y < 1 || y > picture[0].length-2){
             return 195075;
@@ -46,13 +45,13 @@ public class SeamCarver {
         left = picture[x - 1][y];
         right = picture[x + 1][y];
         double ySum = 0;
-        double xSum = Math.pow(right.getBlue() - left.getBlue(), 2) + Math.pow(right.getGreen() - left.getGreen(), 2) + Math.pow(right.getRed() - left.getRed(), 2);
-        ySum = Math.pow(bottom.getBlue() - top.getBlue(), 2) + Math.pow(bottom.getGreen() - top.getGreen(), 2) + Math.pow(bottom.getRed() - top.getRed(), 2);
+        double xSum = Math.pow(right[2] - left[2], 2) + Math.pow(right[1] - left[1], 2) + Math.pow(right[0] - left[0], 2);
+        ySum = Math.pow(bottom[2] - top[2], 2) + Math.pow(bottom[1] - top[1], 2) + Math.pow(bottom[0] - top[0], 2);
  
         return xSum + ySum;
     }
     
-    private double[][] generateEnergy(Color[][] picture){
+    private double[][] generateEnergy(int[][][] picture){
         double[][] grid = new double[picture.length][picture[0].length];
         
         for(int x=0;x<grid.length;x++){
@@ -75,30 +74,31 @@ public class SeamCarver {
     }
     
     public SeamCarver(Picture picture){
-        pic = picture;
-        height = pic.height();
-        width = pic.width();
+        height = picture.height();
+        width = picture.width();
         removalQueue = new Queue<Removal>();
         
-        tempPic = new Color[picture.width()][picture.height()];
+        tempPic = new int[picture.width()][picture.height()][3];
         for(int i=0;i<picture.width();i++){
             for(int j=0;j<picture.height();j++){
-                tempPic[i][j] = picture.get(i, j);
+                int[] color = new int[3];
+                color[0] = picture.get(i, j).getRed();
+                color[1] = picture.get(i, j).getGreen();
+                color[2] = picture.get(i, j).getBlue();
+                tempPic[i][j] = color;
             }
         }
         energyGrid = generateEnergy(tempPic);
     }
     
     public Picture picture(){
-        if(removalQueue.isEmpty()){
-            return pic;
-        }
         updateGrids();
         
-        pic = new Picture(tempPic.length, tempPic[0].length);
+        Picture pic = new Picture(tempPic.length, tempPic[0].length);
         for(int x=0;x<tempPic.length;x++){
             for(int y=0;y<tempPic[0].length;y++){
-                pic.set(x, y, tempPic[x][y]);
+                int[] color = tempPic[x][y];
+                pic.set(x, y, new Color(color[0], color[1], color[2]));
             }
         }
         return pic;
@@ -117,7 +117,7 @@ public class SeamCarver {
     }   
     private void updateGrids(){
         if (!removalQueue.isEmpty()) {
-            Color[][] newTempPic = new Color[tempPic.length][tempPic[0].length];
+            int[][][] newTempPic = new int[tempPic.length][tempPic[0].length][3];
 //        Make copy of pic into Color array
             for (int x = 0; x < tempPic.length; x++) {
                 for (int y = 0; y < tempPic[0].length; y++) {
@@ -129,7 +129,7 @@ public class SeamCarver {
                 int xMax = tempPic.length;
                 int yMax = tempPic[0].length;
                 if (current.getVertical()) {
-                    newTempPic = new Color[tempPic.length - 1][tempPic[0].length];
+                    newTempPic = new int[tempPic.length - 1][tempPic[0].length][3];
                     for (int y = 0; y < yMax; y++) {
                         int diff = 0;
                         for (int x = 0; x < xMax; x++) {
@@ -142,7 +142,7 @@ public class SeamCarver {
                     }
                     tempPic = newTempPic;
                 } else {
-                    newTempPic = new Color[tempPic.length][tempPic[0].length - 1];
+                    newTempPic = new int[tempPic.length][tempPic[0].length - 1][3];
                     for (int x = 0; x < xMax; x++) {
                         int diff = 0;
                         for (int y = 0; y < yMax; y++) {
