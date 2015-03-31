@@ -339,7 +339,6 @@ public class SeamCarver {
                 try{
                     int t = seam[y];
                 }catch(ArrayIndexOutOfBoundsException e){
-                    System.out.println("y = " + y + " yMax = " + yMax + " rightSide = " + rightSide + "length[0]" + (tempPic[0].length-1));
                 }
                 if (x == seam[y]) {
                     diff = 1;
