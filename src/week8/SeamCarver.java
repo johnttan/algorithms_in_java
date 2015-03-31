@@ -77,7 +77,6 @@ public class SeamCarver {
             }
         }
         pic = picture;
-        transpose = false;
     }
     private int nodeID(int x, int y) {
         return x + y * pic.width();
