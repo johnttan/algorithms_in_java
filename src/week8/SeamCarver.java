@@ -211,7 +211,13 @@ public class SeamCarver {
         return verticalSeam;
     }
     
-    public void removeHorizontalSeam(int[] seam){
+    public void removeHorizontalSeam(int[] seam) throws NullPointerException, IllegalArgumentException {
+        if(seam == null){
+            throw new NullPointerException();
+        }
+        if(pic.height() < 1){
+            throw new IllegalArgumentException();
+        }
         Picture newPic = new Picture(pic.width(), pic.height() - 1);
         for(int x=0;x<pic.width();x++){
             int diff = 0;
@@ -234,7 +240,13 @@ public class SeamCarver {
         }
     }
     
-    public void removeVerticalSeam(int[] seam){
+    public void removeVerticalSeam(int[] seam) throws NullPointerException, IllegalArgumentException {
+        if(seam == null){
+            throw new NullPointerException();
+        }
+        if(pic.width() < 1){
+            throw new IllegalArgumentException();
+        }
         Picture newPic = new Picture(pic.width()-1, pic.height());
         for (int y = 0; y < pic.height(); y++) {
             int diff = 0;
