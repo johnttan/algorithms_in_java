@@ -12,35 +12,37 @@ import java.awt.Color;
  */
 public class SeamCarver {
     private Picture pic;
-    private Picture tempPic;
+    private Color[][] tempPic;
     private double[][] energyGrid;
     private double[][] tempEnergyGrid;
     private boolean vertical;
     private boolean rightSide;
-            
-    private double getEnergy(Picture picture, int x, int y){
+    private int width;
+    private int height;
+    
+    private double getEnergy(Color[][] picture, int x, int y){
         Color left = new Color(0);
         Color right = new Color(0);
         Color top = new Color(0);
         Color bottom = new Color(0);
         boolean edge = false;
         try {
-            left = picture.get(x - 1, y);
+            left = picture[x - 1][y];
         } catch (IndexOutOfBoundsException e) {
             edge = true;
         }
         try {
-            right = picture.get(x + 1, y);
+            right = picture[x + 1][y];
         } catch (IndexOutOfBoundsException e) {
             edge = true;
         }
         try {
-            top = picture.get(x, y - 1);
+            top = picture[x][y - 1];
         } catch (IndexOutOfBoundsException e) {
             edge = true;
         }
         try {
-            bottom = picture.get(x, y + 1);
+            bottom = picture[x][y + 1];
         } catch (IndexOutOfBoundsException e) {
             edge = true;
         }
@@ -53,8 +55,8 @@ public class SeamCarver {
         }
     }
     
-    private double[][] generateEnergy(Picture picture){
-        double[][] grid = new double[picture.width()][picture.height()];
+    private double[][] generateEnergy(Color[][] picture){
+        double[][] grid = new double[picture.length][picture[0].length];
         
         for(int x=0;x<grid.length;x++){
             for(int y=0;y<grid[0].length;y++){
@@ -64,14 +66,17 @@ public class SeamCarver {
         return grid;
     }
     
-    private Picture transposeImage(Picture pic, boolean toTranspose){
-        Picture picture = new Picture(pic.height(), pic.width());
-        for(int x=0;x<pic.width();x++){
-            for(int y=0;y<pic.height();y++){
+    private Color[][] transposeImage(Color[][] pic, boolean toTranspose){
+        int oldWidth = pic.length;
+        int oldHeight = pic[0].length;
+        Color[][] picture = new Color[oldHeight][oldWidth];
+        
+        for(int x=0;x<oldWidth;x++){
+            for(int y=0;y<oldHeight;y++){
                 if(toTranspose){
-                    picture.set(pic.height() - 1 - y, x, pic.get(x, y));
+                    picture[oldHeight - 1 - y][x] = pic[x][y];
                 }else{
-                    picture.set(y, pic.width() - 1 - x, pic.get(x, y));
+                    picture[y][oldWidth - 1 - x] = pic[x][y];
                 }
             }
         }
@@ -79,21 +84,28 @@ public class SeamCarver {
         return picture;
     }
     private int nodeID(int x, int y) {
-        return x + y * tempPic.width();
+        return x + y * tempPic.length;
     }
 
     private int[] idToCoord(int id) {
         int[] coord = new int[2];
-        coord[0] = id % tempPic.width();
-        coord[1] = (id - (id % tempPic.width())) / tempPic.width();
+        coord[0] = id % tempPic.length;
+        coord[1] = (id - (id % tempPic.length)) / tempPic.length;
         return coord;
     }
     
     public SeamCarver(Picture picture){
         pic = picture;
-        tempPic = new Picture(picture);
+        height = pic.height();
+        width = pic.width();
+        tempPic = new Color[picture.width()][picture.height()];
+        for(int i=0;i<picture.width();i++){
+            for(int j=0;j<picture.height();j++){
+                tempPic[i][j] = picture.get(i, j);
+            }
+        }
         rightSide = true;
-        energyGrid = generateEnergy(pic);
+        energyGrid = generateEnergy(tempPic);
         tempEnergyGrid = energyGrid;
     }
     
@@ -102,11 +114,11 @@ public class SeamCarver {
     }
     
     public int width(){
-        return pic.width();
+        return width;
     }
     
     public int height(){
-        return pic.height();
+        return height;
     }
     
     public double energy(int x, int y){
@@ -119,20 +131,20 @@ public class SeamCarver {
             tempPic = transposeImage(tempPic, rightSide);
             rightSide = true;
         }
-        int[] results = new int[tempPic.width()];
-        double[] dist = new double[tempPic.width() * tempPic.height()];
-        int[] parentEdge = new int[tempPic.width() * tempPic.height()];
-        boolean[] visited = new boolean[tempPic.width() * tempPic.height()];
+        int[] results = new int[tempPic.length];
+        double[] dist = new double[tempPic.length * tempPic[0].length];
+        int[] parentEdge = new int[tempPic.length * tempPic[0].length];
+        boolean[] visited = new boolean[tempPic.length * tempPic[0].length];
         Queue bfsQueue = new Queue();
-        for(int y=0;y<tempPic.height();y++){
+        for(int y=0;y<tempPic[0].length;y++){
             int currentV = nodeID(0, y);
             dist[currentV] = 0;   
             parentEdge[currentV] = -1;
             bfsQueue.enqueue(currentV);
             visited[currentV] = true;
         }
-        for(int x=1;x<tempPic.width();x++){
-            for(int y=0;y<tempPic.height();y++){
+        for(int x=1;x<tempPic.length;x++){
+            for(int y=0;y<tempPic[0].length;y++){
                 dist[nodeID(x, y)] = Double.MAX_VALUE;
             }
         }
@@ -142,7 +154,7 @@ public class SeamCarver {
             int[] coord = idToCoord(current);
             double currentNodeDist = dist[current];
 
-            if(coord[0] < tempPic.width()-1){
+            if(coord[0] < tempPic.length-1){
                 if (coord[1] > 0) {
 //                    Relax top node
                     int node = nodeID(coord[0] + 1, coord[1] - 1);
@@ -157,7 +169,7 @@ public class SeamCarver {
                         visited[node] = true;
                     }
                 }
-                if (coord[1] < tempPic.height() - 1) {
+                if (coord[1] < tempPic[0].length - 1) {
                     int node = nodeID(coord[0] + 1, coord[1] + 1);
                     double oldDist = dist[node];
                     double newDist = currentNodeDist + tempEnergyGrid[coord[0] + 1][coord[1] + 1];
@@ -186,8 +198,8 @@ public class SeamCarver {
         int maxNode = 0;
         double maxDist = Double.MAX_VALUE;
         
-        for(int i=0;i<tempPic.height();i++){
-            int node = nodeID(tempPic.width()-1, i);
+        for(int i=0;i<tempPic[0].length;i++){
+            int node = nodeID(tempPic.length-1, i);
             if(dist[node] < maxDist){
                 maxDist = dist[node];
                 maxNode = node;
