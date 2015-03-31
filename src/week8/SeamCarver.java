@@ -83,16 +83,26 @@ public class SeamCarver {
         return energyGrid[x][y];
     }
     private int nodeID(int x, int y){
-        return x + y * pic.height();
+        return x + y * pic.width();
+    }
+    private int[] idToCoord(int id){
+        int[] coord = new int[2];
+        coord[0] = id % pic.width();
+        coord[1] = (id - (id % pic.width())) / pic.width();
+        return coord;
     }
     public int[] findHorizontalSeam(){
         int[] results = new int[pic.width()];
         double[] dist = new double[pic.width() * pic.height()];
         int[] parentEdge = new int[pic.width() * pic.height()];
-        
+        Stack dfsStack = new Stack();
+
         for(int y=0;y<pic.height();y++){
-            dist[nodeID(0, y)] = 0;   
-            parentEdge[nodeID(0, y)] = -1;
+            int currentV = nodeID(0, y);
+
+            dist[currentV] = 0;   
+            parentEdge[currentV] = -1;
+            dfsStack.push(currentV);
         }
         for(int x=0;x<pic.width()-1;x++){
             for(int y=0;y<pic.height();y++){
@@ -100,7 +110,59 @@ public class SeamCarver {
             }
         }
         
-        return new int[0];
+        while(!dfsStack.isEmpty()){
+            int current = (int) dfsStack.pop();
+            int[] coord = idToCoord(current);
+            double currentNodeDist = dist[current];
+
+            if(coord[0] > pic.width()-1){
+                if (coord[1] > 0) {
+//                    Relax top node
+                    double oldDist = dist[nodeID(coord[0] + 1, coord[1] - 1)];
+                    double newDist = currentNodeDist + energyGrid[coord[0]+1][coord[1]-1];
+                    if(oldDist > newDist){
+                        dist[nodeID(coord[0]+1, coord[1]-1)] = newDist;
+                        parentEdge[nodeID(coord[0]+1, coord[1]-1)] = current;
+                    }
+                }
+                if (coord[1] < pic.height() - 1) {
+                    double oldDist = dist[nodeID(coord[0] + 1, coord[1] + 1)];
+                    double newDist = currentNodeDist + energyGrid[coord[0] + 1][coord[1] - 1];
+                    if (oldDist > newDist) {
+                        dist[nodeID(coord[0] + 1, coord[1] - 1)] = newDist;
+                        parentEdge[nodeID(coord[0] + 1, coord[1] + 1)] = current;
+                    }
+                }
+                double oldDist = dist[nodeID(coord[0] + 1, coord[1] + 1)];
+                double newDist = currentNodeDist + energyGrid[coord[0] + 1][coord[1] - 1];
+                if (oldDist > newDist) {
+                    dist[nodeID(coord[0] + 1, coord[1] - 1)] = newDist;
+                    parentEdge[nodeID(coord[0] + 1, coord[1])] = current;
+                }
+            }
+        }
+        int maxNode = 0;
+        double maxDist = Double.MAX_VALUE;
+        
+        for(int i=0;i<pic.height();i++){
+            int node = nodeID(pic.width()-1, i);
+            if(dist[node] > maxDist){
+                maxDist = dist[node];
+                System.out.println("setting maxnode " + maxNode);
+                maxNode = node;
+            }
+        }
+        int count = results.length-1;
+        results[count] = maxNode;
+        count --;
+        while(count > -1){
+            maxNode = parentEdge[maxNode];
+            System.out.println(maxNode)
+            results[count] = maxNode;
+            count--;
+        }
+        
+        return results;
     }
     
     public int[] findVerticalSeam(){
