@@ -110,7 +110,10 @@ public class SeamCarver {
         return tempPic[0].length;
     }
     
-    public double energy(int x, int y){
+    public double energy(int x, int y) throws IndexOutOfBoundsException {
+        if(x < 0 || x > tempPic.length-1 || y < 0 || y > tempPic[0].length-1){
+            throw new IndexOutOfBoundsException();
+        }
         return getEnergy(tempPic, x, y);
     }   
     private double[][] updateGrids(){
