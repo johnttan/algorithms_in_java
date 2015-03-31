@@ -15,7 +15,7 @@ public class SeamCarver {
     private Picture tempPic;
     private double[][] energyGrid;
     private double[][] tempEnergyGrid;
-    
+    private boolean vertical;
     private boolean rightSide;
             
     private double getEnergy(Picture picture, int x, int y){
@@ -64,14 +64,14 @@ public class SeamCarver {
         return grid;
     }
     
-    private Picture transposeImage(Picture pic){
+    private Picture transposeImage(Picture pic, boolean toTranspose){
         Picture picture = new Picture(pic.height(), pic.width());
         for(int x=0;x<pic.width();x++){
             for(int y=0;y<pic.height();y++){
-                if(rightSide){
+                if(toTranspose){
                     picture.set(pic.height() - 1 - y, x, pic.get(x, y));
                 }else{
-                    picture.set(y, picture.width() - 1 - x, pic.get(x, y));
+                    picture.set(y, pic.width() - 1 - x, pic.get(x, y));
                 }
             }
         }
@@ -115,9 +115,8 @@ public class SeamCarver {
     
     public int[] findHorizontalSeam(){
 //        Only transpose if orientation is wrong.
-        if(!rightSide){
-            System.out.println("transposed for horizontal");
-            tempPic = transposeImage(tempPic);
+        if(!rightSide && !vertical){
+            tempPic = transposeImage(tempPic, rightSide);
             rightSide = true;
         }
         int[] results = new int[tempPic.width()];
@@ -197,15 +196,15 @@ public class SeamCarver {
     }
     
     public int[] findVerticalSeam(){
+        vertical = true;
         if(rightSide){
-            tempPic = transposeImage(tempPic);
+            tempPic = transposeImage(tempPic, rightSide);
         }
         int[] horizontalSeam = findHorizontalSeam();
-        rightSide = false;
+        vertical = false;
         int[] verticalSeam = new int[pic.height()];
         
-        for(int i=0;i<horizontalSeam.length;i++){
-            System.out.print(horizontalSeam[i]);
+        for(int i=0;i<verticalSeam.length;i++){
             verticalSeam[verticalSeam.length-1-i] = horizontalSeam[i];
         }
 
@@ -227,7 +226,7 @@ public class SeamCarver {
         }
         pic = newPic;
         if(!rightSide){
-            tempPic = new Picture(transposeImage(pic));
+            tempPic = new Picture(transposeImage(pic, true));
 
         }else{
             tempPic = new Picture(pic);
@@ -249,8 +248,7 @@ public class SeamCarver {
         }
         pic = newPic;
         if (!rightSide) {
-            System.out.println("dimensions" + pic.width() + ", " + pic.height());
-            tempPic = new Picture(transposeImage(pic));
+            tempPic = new Picture(transposeImage(pic, true));
         } else {
             tempPic = new Picture(pic);
             tempEnergyGrid = generateEnergy(tempPic);
