@@ -218,6 +218,9 @@ public class SeamCarver {
         if(pic.height() < 1){
             throw new IllegalArgumentException();
         }
+        if(seam.length != pic.width()){
+            throw new IllegalArgumentException();
+        }
         Picture newPic = new Picture(pic.width(), pic.height() - 1);
         for(int x=0;x<pic.width();x++){
             int diff = 0;
@@ -245,6 +248,9 @@ public class SeamCarver {
             throw new NullPointerException();
         }
         if(pic.width() < 1){
+            throw new IllegalArgumentException();
+        }
+        if(seam.length != pic.height()){
             throw new IllegalArgumentException();
         }
         Picture newPic = new Picture(pic.width()-1, pic.height());
