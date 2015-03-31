@@ -16,7 +16,7 @@ public class SeamCarver {
     private int width;
     private int height;
     private Queue<Removal> removalQueue;
-    
+    private Color[][] tempPic;
     private class Removal{
         private int[] seam;
         private boolean vertical;
@@ -80,7 +80,7 @@ public class SeamCarver {
         width = pic.width();
         removalQueue = new Queue<Removal>();
         
-        Color[][] tempPic = new Color[picture.width()][picture.height()];
+        tempPic = new Color[picture.width()][picture.height()];
         for(int i=0;i<picture.width();i++){
             for(int j=0;j<picture.height();j++){
                 tempPic[i][j] = picture.get(i, j);
@@ -93,51 +93,12 @@ public class SeamCarver {
         if(removalQueue.isEmpty()){
             return pic;
         }
-        Color[][] tempPic = new Color[pic.width()][pic.height()];
-//        Make copy of pic into Color array
+        updateGrids();
+        
+        pic = new Picture(tempPic.length, tempPic[0].length);
         for(int x=0;x<tempPic.length;x++){
             for(int y=0;y<tempPic[0].length;y++){
-                tempPic[x][y] = pic.get(x, y);
-            }
-        }
-        Color[][] newTempPic = tempPic;
-        while(!removalQueue.isEmpty()){
-            Removal current = removalQueue.dequeue();
-            int xMax = tempPic.length;
-            int yMax = tempPic[0].length;
-            if(current.getVertical()){
-                newTempPic = new Color[tempPic.length -1][tempPic[0].length];
-                for (int y = 0; y < yMax; y++) {
-                    int diff = 0;
-                    for (int x = 0; x < xMax; x++) {
-                        if (x == current.getSeam()[y]) {
-                            diff = 1;
-                        } else {
-                            newTempPic[x - diff][y] = tempPic[x][y];
-                        }
-                    }
-                }
-                tempPic = newTempPic;
-            }else{
-                newTempPic = new Color[tempPic.length][tempPic[0].length-1];
-                for (int x = 0; x < xMax; x++) {
-                    int diff = 0;
-                    for (int y = 0; y < yMax; y++) {
-                        if (y == current.getSeam()[x]) {
-                            diff = 1;
-                        } else {
-                            newTempPic[x][y - diff] = tempPic[x][y];
-                        }
-                    }
-                }
-                tempPic = newTempPic;
-            }
-        }
-        
-        pic = new Picture(newTempPic.length, newTempPic[0].length);
-        for(int x=0;x<newTempPic.length;x++){
-            for(int y=0;y<newTempPic[0].length;y++){
-                pic.set(x, y, newTempPic[x][y]);
+                pic.set(x, y, tempPic[x][y]);
             }
         }
         return pic;
@@ -154,9 +115,53 @@ public class SeamCarver {
     public double energy(int x, int y){
         return energyGrid[x][y];
     }   
-    
+    private void updateGrids(){
+        if (!removalQueue.isEmpty()) {
+            Color[][] newTempPic = new Color[tempPic.length][tempPic[0].length];
+//        Make copy of pic into Color array
+            for (int x = 0; x < tempPic.length; x++) {
+                for (int y = 0; y < tempPic[0].length; y++) {
+                    newTempPic[x][y] = tempPic[x][y];
+                }
+            }
+            while (!removalQueue.isEmpty()) {
+                Removal current = removalQueue.dequeue();
+                int xMax = tempPic.length;
+                int yMax = tempPic[0].length;
+                if (current.getVertical()) {
+                    newTempPic = new Color[tempPic.length - 1][tempPic[0].length];
+                    for (int y = 0; y < yMax; y++) {
+                        int diff = 0;
+                        for (int x = 0; x < xMax; x++) {
+                            if (x == current.getSeam()[y]) {
+                                diff = 1;
+                            } else {
+                                newTempPic[x - diff][y] = tempPic[x][y];
+                            }
+                        }
+                    }
+                    tempPic = newTempPic;
+                } else {
+                    newTempPic = new Color[tempPic.length][tempPic[0].length - 1];
+                    for (int x = 0; x < xMax; x++) {
+                        int diff = 0;
+                        for (int y = 0; y < yMax; y++) {
+                            if (y == current.getSeam()[x]) {
+                                diff = 1;
+                            } else {
+                                newTempPic[x][y - diff] = tempPic[x][y];
+                            }
+                        }
+                    }
+                    tempPic = newTempPic;
+                }
+            }
+            energyGrid = generateEnergy(tempPic);
+        }
+    }
     public int[] findHorizontalSeam(){
 //        Only transpose if orientation is wrong.
+        updateGrids();
         int[] results = new int[energyGrid.length];
         double[] dist = new double[energyGrid.length * energyGrid[0].length];
         int[] parentEdge = new int[energyGrid.length * energyGrid[0].length];
@@ -247,6 +252,7 @@ public class SeamCarver {
     }
     
     public int[] findVerticalSeam(){
+        updateGrids();
         int[] results = new int[energyGrid[0].length];
         double[] dist = new double[energyGrid.length * energyGrid[0].length];
         int[] parentEdge = new int[energyGrid.length * energyGrid[0].length];
@@ -350,25 +356,6 @@ public class SeamCarver {
         }
         
         removalQueue.enqueue(new Removal(seam, false));
-        
-        int yMax;
-        int xMax;
-        xMax = energyGrid.length;
-        yMax = energyGrid[0].length;
-        double[][] tempEnergy = new double[xMax][yMax-1];
-
-        for(int x=0;x<xMax;x++){
-            int diff = 0;
-
-            for(int y=0;y<yMax;y++){
-                if(y == seam[x]){
-                    diff = 1;
-                }else{
-                    tempEnergy[x][y - diff] = energyGrid[x][y];
-                }
-            }
-        }
-        energyGrid = tempEnergy;
     }
     
     public void removeVerticalSeam(int[] seam) throws NullPointerException, IllegalArgumentException {
@@ -384,24 +371,6 @@ public class SeamCarver {
         }
         
         removalQueue.enqueue(new Removal(seam, true));
-        
-        int yMax;
-        int xMax;
-        xMax = energyGrid.length;
-        yMax = energyGrid[0].length;
-        double[][] tempEnergy = new double[xMax-1][yMax];
-
-        for (int y = 0; y < yMax; y++) {
-            int diff = 0;
-            for (int x = 0; x < xMax; x++) {
-                if (x == seam[y]) {
-                    diff = 1;
-                } else {
-                    tempEnergy[x - diff][y] = energyGrid[x][y];
-                }
-            }
-        }
-        energyGrid = tempEnergy;
     }
     
     public static void main(String[] args){
