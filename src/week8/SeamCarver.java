@@ -25,34 +25,19 @@ public class SeamCarver {
         Color right = new Color(0);
         Color top = new Color(0);
         Color bottom = new Color(0);
-        boolean edge = false;
-        try {
-            left = picture[x - 1][y];
-        } catch (IndexOutOfBoundsException e) {
-            edge = true;
-        }
-        try {
-            right = picture[x + 1][y];
-        } catch (IndexOutOfBoundsException e) {
-            edge = true;
-        }
-        try {
-            top = picture[x][y - 1];
-        } catch (IndexOutOfBoundsException e) {
-            edge = true;
-        }
-        try {
-            bottom = picture[x][y + 1];
-        } catch (IndexOutOfBoundsException e) {
-            edge = true;
-        }
-        if (edge) {
+
+        if(x < 1 || x > picture.length-2 || y < 1 || y > picture[0].length-2){
             return 195075;
-        } else {
-            double xSum = Math.pow(right.getBlue() - left.getBlue(), 2) + Math.pow(right.getGreen() - left.getGreen(), 2) + Math.pow(right.getRed() - left.getRed(), 2);
-            double ySum = Math.pow(bottom.getBlue() - top.getBlue(), 2) + Math.pow(bottom.getGreen() - top.getGreen(), 2) + Math.pow(bottom.getRed() - top.getRed(), 2);
-            return xSum + ySum;
         }
+        bottom = picture[x][y + 1];
+        top = picture[x][y - 1];
+        left = picture[x - 1][y];
+        right = picture[x + 1][y];
+        double ySum = 0;
+        double xSum = Math.pow(right.getBlue() - left.getBlue(), 2) + Math.pow(right.getGreen() - left.getGreen(), 2) + Math.pow(right.getRed() - left.getRed(), 2);
+        ySum = Math.pow(bottom.getBlue() - top.getBlue(), 2) + Math.pow(bottom.getGreen() - top.getGreen(), 2) + Math.pow(bottom.getRed() - top.getRed(), 2);
+ 
+        return xSum + ySum;
     }
     
     private double[][] generateEnergy(Color[][] picture){
@@ -104,6 +89,7 @@ public class SeamCarver {
                 tempPic[i][j] = picture.get(i, j);
             }
         }
+        System.out.println("width=" + tempPic.length);
         rightSide = true;
         energyGrid = generateEnergy(tempPic);
         tempEnergyGrid = energyGrid;
@@ -224,6 +210,7 @@ public class SeamCarver {
         vertical = true;
         if(rightSide){
             tempPic = transposeImage(tempPic, rightSide);
+            rightSide = false;
         }
         int[] horizontalSeam = findHorizontalSeam();
         vertical = false;
@@ -240,30 +227,44 @@ public class SeamCarver {
         if(seam == null){
             throw new NullPointerException();
         }
-        if(pic.height() < 1){
+        if(tempPic[0].length < 1){
             throw new IllegalArgumentException();
         }
-        if(seam.length != pic.width()){
+        if(seam.length != tempPic[0].length){
             throw new IllegalArgumentException();
         }
-        Picture newPic = new Picture(pic.width(), pic.height() - 1);
-        for(int x=0;x<pic.width();x++){
+        Color[][] newPic;
+        int yMax;
+        int xMax;
+        if (rightSide) {
+            yMax = tempPic[0].length;
+            xMax = tempPic.length;
+        } else {
+            yMax = tempPic.length;
+            xMax = tempPic[0].length;
+        }
+        newPic = new Color[xMax][yMax-1];
+
+        for(int x=0;x<xMax;x++){
             int diff = 0;
 
-            for(int y=0;y<pic.height();y++){
+            for(int y=0;y<yMax;y++){
                 if(y == seam[x]){
                     diff = 1;
                 }else{
-                    newPic.set(x, y-diff, pic.get(x, y));
+                    if(rightSide){
+                        newPic[x][y - diff] = tempPic[x][y];
+                    }else{
+                        newPic[x][y - diff] = tempPic[y][x];
+                    }
                 }
             }
         }
-        pic = newPic;
+        tempPic = newPic;
         if(!rightSide){
-            tempPic = new Picture(transposeImage(pic, true));
+            tempPic = transposeImage(tempPic, true);
 
         }else{
-            tempPic = new Picture(pic);
             tempEnergyGrid = generateEnergy(tempPic);
         }
     }
@@ -272,28 +273,47 @@ public class SeamCarver {
         if(seam == null){
             throw new NullPointerException();
         }
-        if(pic.width() < 1){
+        if(tempPic.length < 1){
             throw new IllegalArgumentException();
         }
-        if(seam.length != pic.height()){
+        if(seam.length != tempPic.length){
             throw new IllegalArgumentException();
         }
-        Picture newPic = new Picture(pic.width()-1, pic.height());
-        for (int y = 0; y < pic.height(); y++) {
+        Color[][] newPic;
+        int yMax;
+        int xMax;
+        if(rightSide){
+            xMax = tempPic[0].length;
+            yMax = tempPic.length;
+        }else{
+            yMax = tempPic.length;
+            xMax = tempPic[0].length;
+        }
+        newPic = new Color[xMax-1][yMax];
+
+        for (int y = 0; y < yMax; y++) {
             int diff = 0;
-            for (int x = 0; x < pic.width(); x++) {
+            for (int x = 0; x < xMax; x++) {
+                try{
+                    int t = seam[y];
+                }catch(ArrayIndexOutOfBoundsException e){
+                    System.out.println("y = " + y + " yMax = " + yMax + " rightSide = " + rightSide + "length[0]" + (tempPic[0].length-1));
+                }
                 if (x == seam[y]) {
                     diff = 1;
                 } else {
-                    newPic.set(x-diff, y, pic.get(x, y));
+                    if(rightSide){
+                        newPic[x - diff][y] = tempPic[x][y];
+                    }else{
+                        newPic[x - diff][y] = tempPic[y][x];
+                    }
                 }
             }
         }
-        pic = newPic;
+        tempPic = newPic;
         if (!rightSide) {
-            tempPic = new Picture(transposeImage(pic, true));
+            tempPic = transposeImage(tempPic, true);
         } else {
-            tempPic = new Picture(pic);
             tempEnergyGrid = generateEnergy(tempPic);
         }
     }
