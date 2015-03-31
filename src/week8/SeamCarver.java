@@ -15,7 +15,7 @@ public class SeamCarver {
     private double[][] energyGrid;
     private int width;
     private int height;
-    Queue<Removal> removalQueue;
+    private Queue<Removal> removalQueue;
     
     private class Removal{
         private int[] seam;
