@@ -13,10 +13,8 @@ import java.awt.Color;
 public class SeamCarver {
     private Picture pic;
     private double[][] energyGrid;
-    private Topological verticalTopo;
-    private Topological horizontalTopo;
     private boolean rightSide;
-    
+            
     private double getEnergy(Picture picture, int x, int y){
         Color left = new Color(0);
         Color right = new Color(0);
@@ -66,10 +64,31 @@ public class SeamCarver {
     private void transposeImage(){
         Picture picture = new Picture(pic.height(), pic.width());
         if(rightSide){
-            
+            for(int x=0;x<pic.width();x++){
+                for(int y=0;y<pic.height();y++){
+                    picture.set(pic.height() -1 - x, x, pic.get(x, y));
+                }
+            }
+        }else{
+            for(int x=0;x<pic.width();x++){
+                for(int y=0;y<pic.height();y++){
+                    picture.set(y, pic.width()-1-x, pic.get(x, y));
+                }
+            }
         }
+        pic = picture;
+        transpose = false;
     }
-    
+    private int nodeID(int x, int y) {
+        return x + y * pic.width();
+    }
+
+    private int[] idToCoord(int id) {
+        int[] coord = new int[2];
+        coord[0] = id % pic.width();
+        coord[1] = (id - (id % pic.width())) / pic.width();
+        return coord;
+    }
     public SeamCarver(Picture picture){
         pic = picture;
         rightSide = true;
@@ -90,26 +109,23 @@ public class SeamCarver {
     
     public double energy(int x, int y){
         return energyGrid[x][y];
-    }
-    private int nodeID(int x, int y){
-        return x + y * pic.width();
-    }
-    private int[] idToCoord(int id){
-        int[] coord = new int[2];
-        coord[0] = id % pic.width();
-        coord[1] = (id - (id % pic.width())) / pic.width();
-        return coord;
-    }
+    }   
+    
     public int[] findHorizontalSeam(){
+//        Only transpose if orientation is wrong.
+        if(!rightSide){
+            transposeImage();
+            rightSide = true;
+        }
         int[] results = new int[pic.width()];
         double[] dist = new double[pic.width() * pic.height()];
         int[] parentEdge = new int[pic.width() * pic.height()];
-        Queue dfsQueue = new Queue();
+        Queue bfQueue = new Queue();
         for(int y=0;y<pic.height();y++){
             int currentV = nodeID(0, y);
             dist[currentV] = 0;   
             parentEdge[currentV] = -1;
-            dfsQueue.enqueue(currentV);
+            bfsQueue.enqueue(currentV);
 
         }
         for(int x=1;x<pic.width();x++){
@@ -118,8 +134,8 @@ public class SeamCarver {
             }
         }
         
-        while(!dfsQueue.isEmpty()){
-            int current = (int) dfsQueue.dequeue();
+        while(!bfsQueue.isEmpty()){
+            int current = (int) bfsQueue.dequeue();
             int[] coord = idToCoord(current);
             double currentNodeDist = dist[current];
 
@@ -132,7 +148,7 @@ public class SeamCarver {
                         dist[nodeID(coord[0]+1, coord[1]-1)] = newDist;
                         parentEdge[nodeID(coord[0]+1, coord[1]-1)] = current;
                     }
-                    dfsQueue.enqueue(nodeID(coord[0] + 1, coord[1] - 1));
+                    bfsQueue.enqueue(nodeID(coord[0] + 1, coord[1] - 1));
                 }
                 if (coord[1] < pic.height() - 1) {
                     double oldDist = dist[nodeID(coord[0] + 1, coord[1] + 1)];
@@ -141,7 +157,7 @@ public class SeamCarver {
                         dist[nodeID(coord[0] + 1, coord[1] + 1)] = newDist;
                         parentEdge[nodeID(coord[0] + 1, coord[1] + 1)] = current;
                     }
-                    dfsQueue.enqueue(nodeID(coord[0] + 1, coord[1] + 1));
+                    bfsQueue.enqueue(nodeID(coord[0] + 1, coord[1] + 1));
                 }
                 double oldDist = dist[nodeID(coord[0] + 1, coord[1])];
                 double newDist = currentNodeDist + energyGrid[coord[0] + 1][coord[1]];
@@ -149,7 +165,7 @@ public class SeamCarver {
                     dist[nodeID(coord[0] + 1, coord[1])] = newDist;
                     parentEdge[nodeID(coord[0] + 1, coord[1])] = current;
                 }
-                dfsQueue.enqueue(nodeID(coord[0] +1, coord[1]));
+                bfsQueue.enqueue(nodeID(coord[0] +1, coord[1]));
             }
         }
         int maxNode = 0;
@@ -178,7 +194,17 @@ public class SeamCarver {
     }
     
     public int[] findVerticalSeam(){
-        return new int[0];
+        if(rightSide){
+            transposeImage();
+        }
+        int[] horizontalSeam = findHorizontalSeam();
+        rightSide = false;
+        int[] verticalSeam = new int[pic.width()];
+        
+        for(int i=0;i<horizontalSeam.length;i++){
+            System.out.println(horizontalSeam[i]);
+        }
+        return verticalSeam;
     }
     
     public void removeHorizontalSeam(int[] seam){
