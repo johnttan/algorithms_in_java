@@ -11,7 +11,6 @@ import java.awt.Color;
  * @author johntan
  */
 public class SeamCarver {
-    private double[][] energyGrid;
     private int width;
     private int height;
     private Queue<Removal> removalQueue;
@@ -63,13 +62,13 @@ public class SeamCarver {
     }
 
     private int nodeID(int x, int y) {
-        return x + y * energyGrid.length;
+        return x + y * width();
     }
 
     private int[] idToCoord(int id) {
         int[] coord = new int[2];
-        coord[0] = id % energyGrid.length;
-        coord[1] = (id - (id % energyGrid.length)) / energyGrid.length;
+        coord[0] = id % width();
+        coord[1] = (id - (id % width())) / width();
         return coord;
     }
     
@@ -88,7 +87,6 @@ public class SeamCarver {
                 tempPic[i][j] = color;
             }
         }
-        energyGrid = generateEnergy(tempPic);
     }
     
     public Picture picture(){
@@ -105,17 +103,17 @@ public class SeamCarver {
     }
     
     public int width(){
-        return width;
+        return tempPic.length;
     }
     
     public int height(){
-        return height;
+        return tempPic[0].length;
     }
     
     public double energy(int x, int y){
-        return energyGrid[x][y];
+        return getEnergy(tempPic, x, y);
     }   
-    private void updateGrids(){
+    private double[][] updateGrids(){
         if (!removalQueue.isEmpty()) {
             int[][][] newTempPic = new int[tempPic.length][tempPic[0].length][3];
 //        Make copy of pic into Color array
@@ -156,12 +154,12 @@ public class SeamCarver {
                     tempPic = newTempPic;
                 }
             }
-            energyGrid = generateEnergy(tempPic);
         }
+        return generateEnergy(tempPic);
     }
     public int[] findHorizontalSeam(){
 //        Only transpose if orientation is wrong.
-        updateGrids();
+        double[][] energyGrid = updateGrids();
         int[] results = new int[energyGrid.length];
         double[] dist = new double[energyGrid.length * energyGrid[0].length];
         int[] parentEdge = new int[energyGrid.length * energyGrid[0].length];
@@ -252,7 +250,7 @@ public class SeamCarver {
     }
     
     public int[] findVerticalSeam(){
-        updateGrids();
+        double[][] energyGrid = updateGrids();
         int[] results = new int[energyGrid[0].length];
         double[] dist = new double[energyGrid.length * energyGrid[0].length];
         int[] parentEdge = new int[energyGrid.length * energyGrid[0].length];
@@ -348,10 +346,10 @@ public class SeamCarver {
             throw new NullPointerException();
         }
 
-        if (energyGrid[0].length < 1) {
+        if (height() < 1) {
             throw new IllegalArgumentException();
         }
-        if (seam.length != energyGrid.length) {
+        if (seam.length != width()) {
             throw new IllegalArgumentException();
         }
         
@@ -363,10 +361,10 @@ public class SeamCarver {
             throw new NullPointerException();
         }
 
-        if (energyGrid.length < 1) {
+        if (width() < 1) {
             throw new IllegalArgumentException();
         }
-        if (seam.length != energyGrid[0].length) {
+        if (seam.length != height()) {
             throw new IllegalArgumentException();
         }
         
