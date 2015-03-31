@@ -96,6 +96,15 @@ public class SeamCarver {
     }
     
     public Picture picture(){
+        if(!rightSide){
+            Color[][] rightGrid = transposeImage(tempPic, false);
+            pic = new Picture(rightGrid.length, rightGrid[0].length);
+            for(int x=0;x<rightGrid.length;x++){
+                for(int y=0;y<rightGrid[0].length;y++){
+                    pic.set(x, y, rightGrid[x][y]);
+                }
+            }
+        }
         return pic;
     }
     
