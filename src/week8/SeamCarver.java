@@ -99,12 +99,12 @@ public class SeamCarver {
 
         for(int y=0;y<pic.height();y++){
             int currentV = nodeID(0, y);
-
             dist[currentV] = 0;   
             parentEdge[currentV] = -1;
             dfsStack.push(currentV);
+
         }
-        for(int x=0;x<pic.width()-1;x++){
+        for(int x=1;x<pic.width();x++){
             for(int y=0;y<pic.height();y++){
                 dist[nodeID(x, y)] = Double.MAX_VALUE;
             }
@@ -114,8 +114,9 @@ public class SeamCarver {
             int current = (int) dfsStack.pop();
             int[] coord = idToCoord(current);
             double currentNodeDist = dist[current];
+            System.out.println("CURRENT DIST " + dist[current] + " " + current);
 
-            if(coord[0] > pic.width()-1){
+            if(coord[0] < pic.width()-1){
                 if (coord[1] > 0) {
 //                    Relax top node
                     double oldDist = dist[nodeID(coord[0] + 1, coord[1] - 1)];
@@ -124,21 +125,24 @@ public class SeamCarver {
                         dist[nodeID(coord[0]+1, coord[1]-1)] = newDist;
                         parentEdge[nodeID(coord[0]+1, coord[1]-1)] = current;
                     }
+                    dfsStack.push(nodeID(coord[0] + 1, coord[1] - 1));
                 }
                 if (coord[1] < pic.height() - 1) {
                     double oldDist = dist[nodeID(coord[0] + 1, coord[1] + 1)];
-                    double newDist = currentNodeDist + energyGrid[coord[0] + 1][coord[1] - 1];
+                    double newDist = currentNodeDist + energyGrid[coord[0] + 1][coord[1] + 1];
                     if (oldDist > newDist) {
-                        dist[nodeID(coord[0] + 1, coord[1] - 1)] = newDist;
+                        dist[nodeID(coord[0] + 1, coord[1] + 1)] = newDist;
                         parentEdge[nodeID(coord[0] + 1, coord[1] + 1)] = current;
                     }
+                    dfsStack.push(nodeID(coord[0] + 1, coord[1] + 1));
                 }
-                double oldDist = dist[nodeID(coord[0] + 1, coord[1] + 1)];
-                double newDist = currentNodeDist + energyGrid[coord[0] + 1][coord[1] - 1];
+                double oldDist = dist[nodeID(coord[0] + 1, coord[1])];
+                double newDist = currentNodeDist + energyGrid[coord[0] + 1][coord[1]];
                 if (oldDist > newDist) {
-                    dist[nodeID(coord[0] + 1, coord[1] - 1)] = newDist;
+                    dist[nodeID(coord[0] + 1, coord[1])] = newDist;
                     parentEdge[nodeID(coord[0] + 1, coord[1])] = current;
                 }
+                dfsStack.push(nodeID(coord[0] +1, coord[1]));
             }
         }
         int maxNode = 0;
@@ -146,18 +150,17 @@ public class SeamCarver {
         
         for(int i=0;i<pic.height();i++){
             int node = nodeID(pic.width()-1, i);
+
             if(dist[node] > maxDist){
                 maxDist = dist[node];
-                System.out.println("setting maxnode " + maxNode);
                 maxNode = node;
             }
         }
         int count = results.length-1;
         results[count] = maxNode;
         count --;
-        while(count > -1){
+        while(maxNode > 0){
             maxNode = parentEdge[maxNode];
-            System.out.println(maxNode)
             results[count] = maxNode;
             count--;
         }
