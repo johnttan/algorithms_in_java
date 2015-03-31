@@ -1,5 +1,6 @@
 
 import java.awt.Color;
+import java.util.Arrays;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -118,45 +119,33 @@ public class SeamCarver {
     }   
     private double[][] updateGrids(){
         if (!removalQueue.isEmpty()) {
-            int[][][] newTempPic = new int[tempPic.length][tempPic[0].length][3];
-//        Make copy of pic into Color array
-            for (int x = 0; x < tempPic.length; x++) {
-                for (int y = 0; y < tempPic[0].length; y++) {
-                    newTempPic[x][y] = tempPic[x][y];
-                }
-            }
+            int[][][] newTempPic = new int[0][0][0];
             while (!removalQueue.isEmpty()) {
                 Removal current = removalQueue.dequeue();
                 int xMax = tempPic.length;
                 int yMax = tempPic[0].length;
+//                Copy over relevant sections of arrays minus the pixel to be removed.
                 if (current.getVertical()) {
                     newTempPic = new int[tempPic.length - 1][tempPic[0].length][3];
                     for (int y = 0; y < yMax; y++) {
-                        int diff = 0;
-                        for (int x = 0; x < xMax; x++) {
-                            if (x == current.getSeam()[y]) {
-                                diff = 1;
-                            } else {
-                                newTempPic[x - diff][y] = tempPic[x][y];
-                            }
+                        int xToRemove = current.getSeam()[y];
+                        System.arraycopy(tempPic[xToRemove], 0, newTempPic[xToRemove], 0, y);
+                        if(y < tempPic[0].length - 1){
+                            System.arraycopy(tempPic[xToRemove], y+1, newTempPic[xToRemove], y, tempPic[0].length - y - 1);
                         }
                     }
-                    tempPic = newTempPic;
                 } else {
                     newTempPic = new int[tempPic.length][tempPic[0].length - 1][3];
                     for (int x = 0; x < xMax; x++) {
-                        int diff = 0;
-                        for (int y = 0; y < yMax; y++) {
-                            if (y == current.getSeam()[x]) {
-                                diff = 1;
-                            } else {
-                                newTempPic[x][y - diff] = tempPic[x][y];
-                            }
+                        int yToRemove = current.getSeam()[x];
+                        System.arraycopy(tempPic[x], 0, newTempPic[x], 0, yToRemove);
+                        if(yToRemove < tempPic[0].length-1){
+                            System.arraycopy(tempPic[x], yToRemove + 1, newTempPic[x], yToRemove, tempPic[0].length - yToRemove - 1);
                         }
                     }
-                    tempPic = newTempPic;
                 }
             }
+            tempPic = newTempPic;
         }
         return generateEnergy(tempPic);
     }
