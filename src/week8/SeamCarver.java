@@ -239,9 +239,16 @@ public class SeamCarver {
         if(tempPic[0].length < 1){
             throw new IllegalArgumentException();
         }
-        if(seam.length != tempPic[0].length){
-            throw new IllegalArgumentException();
+        if(rightSide){
+            if (seam.length != tempPic[0].length) {
+                throw new IllegalArgumentException();
+            }
+        }else{
+            if (seam.length != tempPic.length) {
+                throw new IllegalArgumentException();
+            }
         }
+
         Color[][] newPic;
         int yMax;
         int xMax;
@@ -285,9 +292,16 @@ public class SeamCarver {
         if(tempPic.length < 1){
             throw new IllegalArgumentException();
         }
-        if(seam.length != tempPic.length){
-            throw new IllegalArgumentException();
+        if(rightSide){
+            if (seam.length != tempPic.length) {
+                throw new IllegalArgumentException();
+            }
+        }else{
+            if(seam.length != tempPic[0].length){
+                throw new IllegalArgumentException();
+            }
         }
+
         Color[][] newPic;
         int yMax;
         int xMax;
