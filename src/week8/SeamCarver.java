@@ -166,12 +166,11 @@ public class SeamCarver {
         int[] results = new int[energyGrid.length];
         double[][] dist = new double[energyGrid.length][energyGrid[0].length];
         int[][][] parentEdge = new int[energyGrid.length][energyGrid[0].length][2];
-        boolean[][] visited = new boolean[energyGrid.length][energyGrid[0].length];
         
         for(int x=0;x<energyGrid.length;x++){
             for(int y=0;y<energyGrid[0].length;y++){
                 dist[x][y] = energyGrid[x][y];
-                parentEdge[x][y] = -1;
+                parentEdge[x][y] = new int[]{-1, -1};
             }
         }
         for (int x = 1; x < energyGrid.length; x++) {
@@ -198,86 +197,23 @@ public class SeamCarver {
                 }
             }
         }
-        
-        Queue bfsQueue = new Queue();
+        int[] minNode = new int[2];
+        double minDist = Double.MAX_VALUE;
+//        Get start of shortest path;
         for(int y=0;y<energyGrid[0].length;y++){
-            int currentV = nodeID(0, y);
-            dist[currentV] = 0;   
-            parentEdge[currentV] = -1;
-            bfsQueue.enqueue(currentV);
-            visited[currentV] = true;
-        }
-        for(int x=1;x<energyGrid.length;x++){
-            for(int y=0;y<energyGrid[0].length;y++){
-                dist[nodeID(x, y)] = Double.MAX_VALUE;
-            }
-        }
-        
-        while(!bfsQueue.isEmpty()){
-            int current = (int) bfsQueue.dequeue();
-            int[] coord = idToCoord(current);
-            double currentNodeDist = dist[current];
-
-            if(coord[0] < energyGrid.length-1){
-                if (coord[1] > 0) {
-//                    Relax top node
-                    int node = nodeID(coord[0] + 1, coord[1] - 1);
-                    double oldDist = dist[node];
-                    double newDist = currentNodeDist + energyGrid[coord[0]+1][coord[1]-1];
-                    if(oldDist > newDist){
-                        dist[node] = newDist;
-                        parentEdge[node] = current;
-                    }
-                    if(!visited[node]){
-                        bfsQueue.enqueue(node);
-                        visited[node] = true;
-                    }
-                }
-                if (coord[1] < energyGrid[0].length - 1) {
-                    int node = nodeID(coord[0] + 1, coord[1] + 1);
-                    double oldDist = dist[node];
-                    double newDist = currentNodeDist + energyGrid[coord[0] + 1][coord[1] + 1];
-                    if (oldDist > newDist) {
-                        dist[node] = newDist;
-                        parentEdge[node] = current;
-                    }
-                    if(!visited[node]){
-                        visited[node] = true;
-                        bfsQueue.enqueue(node);
-                    }
-                }
-                int node = nodeID(coord[0] + 1, coord[1]);
-                double oldDist = dist[node];
-                double newDist = currentNodeDist + energyGrid[coord[0] + 1][coord[1]];
-                if (oldDist > newDist) {
-                    dist[node] = newDist;
-                    parentEdge[node] = current;
-                }
-                if(!visited[node]){
-                    bfsQueue.enqueue(nodeID(coord[0] + 1, coord[1]));
-                    visited[node] = true;
-                }
-            }
-        }
-        int maxNode = 0;
-        double maxDist = Double.MAX_VALUE;
-        
-        for(int i=0;i<energyGrid[0].length;i++){
-            int node = nodeID(energyGrid.length-1, i);
-            if(dist[node] < maxDist){
-                maxDist = dist[node];
-                maxNode = node;
+            if(dist[energyGrid.length-1][y] < minDist){
+                minDist = dist[energyGrid.length - 1][y];
+                minNode[0] = energyGrid.length-1;
+                minNode[1] = y;
             }
         }
         int count = results.length-1;
-        int[] coord = idToCoord(maxNode);
-        results[count] = coord[1];
+        results[count] = minNode[1];
         count --;
         while(count >= 0){
-            maxNode = parentEdge[maxNode];
-            int[] cd = idToCoord(maxNode);
+            minNode = parentEdge[minNode[0]][minNode[1]];
 
-            results[count] = cd[1];
+            results[count] = minNode[1];
             count--;
         }
         
