@@ -1,5 +1,6 @@
 
 import java.awt.Color;
+import java.util.Arrays;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -61,16 +62,6 @@ public class SeamCarver {
         return grid;
     }
 
-    private int nodeID(int x, int y) {
-        return x + y * width();
-    }
-
-    private int[] idToCoord(int id) {
-        int[] coord = new int[2];
-        coord[0] = id % width();
-        coord[1] = (id - (id % width())) / width();
-        return coord;
-    }
     
     public SeamCarver(Picture picture){
         height = picture.height();
@@ -103,11 +94,11 @@ public class SeamCarver {
     }
     
     public int width(){
-        return tempPic.length;
+        return width;
     }
     
     public int height(){
-        return tempPic[0].length;
+        return height;
     }
     
     public double energy(int x, int y) throws IndexOutOfBoundsException {
@@ -218,7 +209,7 @@ public class SeamCarver {
         return results;
     }
     
-    public int[] findVerticalSeam(){
+    public int[] findVerticalSeam() {
         double[][] energyGrid = updateGrids();
         int[] results = new int[energyGrid[0].length];
         double[][] dist = new double[energyGrid.length][energyGrid[0].length];
@@ -240,7 +231,7 @@ public class SeamCarver {
                     parentEdge[x][y][0] = x - 1;
                     parentEdge[x][y][1] = y - 1;
                 }
-                if (x < energyGrid[0].length - 1 && dist[x + 1][y - 1] + energyGrid[x][y] < dist[x][y]) {
+                if (x < energyGrid.length - 1 && dist[x + 1][y - 1] + energyGrid[x][y] < dist[x][y]) {
                     dist[x][y] = dist[x + 1][y - 1] + energyGrid[x][y];
                     parentEdge[x][y][0] = x + 1;
                     parentEdge[x][y][1] = y - 1;
@@ -286,7 +277,10 @@ public class SeamCarver {
         if (seam.length != width()) {
             throw new IllegalArgumentException();
         }
-        
+        height --;
+        if(height == 0){
+            width = 0;
+        }
         removalQueue.enqueue(new Removal(seam, false));
     }
     
@@ -294,14 +288,16 @@ public class SeamCarver {
         if(seam == null){
             throw new NullPointerException();
         }
-
         if (width() < 1) {
             throw new IllegalArgumentException();
         }
         if (seam.length != height()) {
             throw new IllegalArgumentException();
         }
-        
+        width --;
+        if(width == 0){
+            height = 0;
+        }
         removalQueue.enqueue(new Removal(seam, true));
     }
     
