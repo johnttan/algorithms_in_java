@@ -164,9 +164,41 @@ public class SeamCarver {
 //        Only transpose if orientation is wrong.
         double[][] energyGrid = updateGrids();
         int[] results = new int[energyGrid.length];
-        double[] dist = new double[energyGrid.length * energyGrid[0].length];
-        int[] parentEdge = new int[energyGrid.length * energyGrid[0].length];
-        boolean[] visited = new boolean[energyGrid.length * energyGrid[0].length];
+        double[][] dist = new double[energyGrid.length][energyGrid[0].length];
+        int[][][] parentEdge = new int[energyGrid.length][energyGrid[0].length][2];
+        boolean[][] visited = new boolean[energyGrid.length][energyGrid[0].length];
+        
+        for(int x=0;x<energyGrid.length;x++){
+            for(int y=0;y<energyGrid[0].length;y++){
+                dist[x][y] = energyGrid[x][y];
+                parentEdge[x][y] = -1;
+            }
+        }
+        for (int x = 1; x < energyGrid.length; x++) {
+            for (int y = 0; y < energyGrid[0].length; y++) {
+                dist[x][y] = Double.MAX_VALUE;
+            }
+        }
+        for(int x=1;x<energyGrid.length;x++){
+            for(int y=0;y<energyGrid[0].length;y++){
+                if(y > 0 && dist[x-1][y-1] + energyGrid[x][y] < dist[x][y]){
+                    dist[x][y] = dist[x - 1][y - 1] + energyGrid[x][y];
+                    parentEdge[x][y][0] = x-1;
+                    parentEdge[x][y][1] = y - 1;
+                }
+                if (y < energyGrid[0].length-1 && dist[x - 1][y + 1] + energyGrid[x][y] < dist[x][y]) {
+                    dist[x][y] = dist[x - 1][y + 1] + energyGrid[x][y];
+                    parentEdge[x][y][0] = x - 1;
+                    parentEdge[x][y][1] = y + 1;
+                }
+                if (dist[x - 1][y] + energyGrid[x][y] < dist[x][y]) {
+                    dist[x][y] = dist[x - 1][y] + energyGrid[x][y];
+                    parentEdge[x][y][0] = x - 1;
+                    parentEdge[x][y][1] = y;
+                }
+            }
+        }
+        
         Queue bfsQueue = new Queue();
         for(int y=0;y<energyGrid[0].length;y++){
             int currentV = nodeID(0, y);
