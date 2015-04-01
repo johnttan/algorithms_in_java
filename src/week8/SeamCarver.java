@@ -51,18 +51,6 @@ public class SeamCarver {
         return xSum + ySum;
     }
     
-    private double[][] generateEnergy(int[][][] picture){
-        double[][] grid = new double[picture.length][picture[0].length];
-        
-        for(int x=0;x<grid.length;x++){
-            for(int y=0;y<grid[0].length;y++){
-                grid[x][y] = getEnergy(picture, x, y);
-            }
-        }
-        return grid;
-    }
-
-    
     public SeamCarver(Picture picture){
         height = picture.height();
         width = picture.width();
@@ -107,7 +95,7 @@ public class SeamCarver {
         }
         return getEnergy(tempPic, x, y);
     }   
-    private double[][] updateGrids(){
+    private void updateGrids(){
         if (!removalQueue.isEmpty()) {
             int[][][] newTempPic = new int[tempPic.length][tempPic[0].length][3];
 //        Make copy of pic into Color array
@@ -149,38 +137,37 @@ public class SeamCarver {
                 }
             }
         }
-        return generateEnergy(tempPic);
     }
     public int[] findHorizontalSeam(){
 //        Only transpose if orientation is wrong.
-        double[][] energyGrid = updateGrids();
-        int[] results = new int[energyGrid.length];
-        double[][] dist = new double[energyGrid.length][energyGrid[0].length];
-        int[][][] parentEdge = new int[energyGrid.length][energyGrid[0].length][2];
+        int[] results = new int[tempPic.length];
+        double[][] dist = new double[tempPic.length][tempPic[0].length];
+        int[][][] parentEdge = new int[tempPic.length][tempPic[0].length][2];
         
-        for(int x=0;x<energyGrid.length;x++){
-            for(int y=0;y<energyGrid[0].length;y++){
+        for(int x=0;x<tempPic.length;x++){
+            for(int y=0;y<tempPic[0].length;y++){
                 dist[x][y] = Double.MAX_VALUE;
                 parentEdge[x][y] = new int[]{-1, -1};
             }
         }
-        for (int y = 0; y < energyGrid[0].length; y++) {
-            dist[0][y] = energyGrid[0][y];
+        for (int y = 0; y < tempPic[0].length; y++) {
+            dist[0][y] = energy(0, y);
         }
-        for(int x=1;x<energyGrid.length;x++){
-            for(int y=0;y<energyGrid[0].length;y++){
-                if(y > 0 && dist[x-1][y-1] + energyGrid[x][y] < dist[x][y]){
-                    dist[x][y] = dist[x - 1][y - 1] + energyGrid[x][y];
+        for(int x=1;x<tempPic.length;x++){
+            for(int y=0;y<tempPic[0].length;y++){
+                double ener = energy(x, y);
+                if(y > 0 && dist[x-1][y-1] + ener < dist[x][y]){
+                    dist[x][y] = dist[x - 1][y - 1] + ener;
                     parentEdge[x][y][0] = x-1;
                     parentEdge[x][y][1] = y - 1;
                 }
-                if (y < energyGrid[0].length-1 && dist[x - 1][y + 1] + energyGrid[x][y] < dist[x][y]) {
-                    dist[x][y] = dist[x - 1][y + 1] + energyGrid[x][y];
+                if (y < tempPic[0].length-1 && dist[x - 1][y + 1] + ener < dist[x][y]) {
+                    dist[x][y] = dist[x - 1][y + 1] + ener;
                     parentEdge[x][y][0] = x - 1;
                     parentEdge[x][y][1] = y + 1;
                 }
-                if (dist[x - 1][y] + energyGrid[x][y] < dist[x][y]) {
-                    dist[x][y] = dist[x - 1][y] + energyGrid[x][y];
+                if (dist[x - 1][y] + ener < dist[x][y]) {
+                    dist[x][y] = dist[x - 1][y] + ener;
                     parentEdge[x][y][0] = x - 1;
                     parentEdge[x][y][1] = y;
                 }
@@ -189,10 +176,10 @@ public class SeamCarver {
         int[] minNode = new int[2];
         double minDist = Double.MAX_VALUE;
 //        Get start of shortest path;
-        for(int y=0;y<energyGrid[0].length;y++){
-            if(dist[energyGrid.length-1][y] < minDist){
-                minDist = dist[energyGrid.length - 1][y];
-                minNode[0] = energyGrid.length-1;
+        for(int y=0;y<tempPic[0].length;y++){
+            if(dist[tempPic.length-1][y] < minDist){
+                minDist = dist[tempPic.length - 1][y];
+                minNode[0] = tempPic.length-1;
                 minNode[1] = y;
             }
         }
