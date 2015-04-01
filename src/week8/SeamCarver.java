@@ -220,7 +220,7 @@ public class SeamCarver {
     
     public int[] findVerticalSeam(){
         double[][] energyGrid = updateGrids();
-        int[] results = new int[energyGrid.length];
+        int[] results = new int[energyGrid[0].length];
         double[][] dist = new double[energyGrid.length][energyGrid[0].length];
         int[][][] parentEdge = new int[energyGrid.length][energyGrid[0].length][2];
 
@@ -230,45 +230,45 @@ public class SeamCarver {
                 parentEdge[x][y] = new int[]{-1, -1};
             }
         }
-        for (int y = 0; y < energyGrid[0].length; y++) {
-            dist[0][y] = energyGrid[0][y];
+        for (int x = 0; x < energyGrid.length; x++) {
+            dist[x][0] = energyGrid[x][0];
         }
-        for (int x = 1; x < energyGrid.length; x++) {
-            for (int y = 0; y < energyGrid[0].length; y++) {
-                if (y > 0 && dist[x - 1][y - 1] + energyGrid[x][y] < dist[x][y]) {
+        for (int y = 1; y < energyGrid[0].length; y++) {
+            for (int x = 0; x < energyGrid.length; x++) {
+                if (x > 0 && dist[x - 1][y - 1] + energyGrid[x][y] < dist[x][y]) {
                     dist[x][y] = dist[x - 1][y - 1] + energyGrid[x][y];
                     parentEdge[x][y][0] = x - 1;
                     parentEdge[x][y][1] = y - 1;
                 }
-                if (y < energyGrid[0].length - 1 && dist[x - 1][y + 1] + energyGrid[x][y] < dist[x][y]) {
-                    dist[x][y] = dist[x - 1][y + 1] + energyGrid[x][y];
-                    parentEdge[x][y][0] = x - 1;
-                    parentEdge[x][y][1] = y + 1;
+                if (x < energyGrid[0].length - 1 && dist[x + 1][y - 1] + energyGrid[x][y] < dist[x][y]) {
+                    dist[x][y] = dist[x + 1][y - 1] + energyGrid[x][y];
+                    parentEdge[x][y][0] = x + 1;
+                    parentEdge[x][y][1] = y - 1;
                 }
-                if (dist[x - 1][y] + energyGrid[x][y] < dist[x][y]) {
-                    dist[x][y] = dist[x - 1][y] + energyGrid[x][y];
-                    parentEdge[x][y][0] = x - 1;
-                    parentEdge[x][y][1] = y;
+                if (dist[x][y-1] + energyGrid[x][y] < dist[x][y]) {
+                    dist[x][y] = dist[x][y - 1] + energyGrid[x][y];
+                    parentEdge[x][y][0] = x;
+                    parentEdge[x][y][1] = y - 1;
                 }
             }
         }
         int[] minNode = new int[2];
         double minDist = Double.MAX_VALUE;
 //        Get start of shortest path;
-        for (int y = 0; y < energyGrid[0].length; y++) {
-            if (dist[energyGrid.length - 1][y] < minDist) {
-                minDist = dist[energyGrid.length - 1][y];
-                minNode[0] = energyGrid.length - 1;
-                minNode[1] = y;
+        for (int x = 0; x < energyGrid.length; x++) {
+            if (dist[x][energyGrid[0].length-1] < minDist) {
+                minDist = dist[x][energyGrid[0].length-1];
+                minNode[0] = x;
+                minNode[1] = energyGrid[0].length-1;
             }
         }
         int count = results.length - 1;
-        results[count] = minNode[1];
+        results[count] = minNode[0];
         count--;
         while (count >= 0) {
             minNode = parentEdge[minNode[0]][minNode[1]];
 
-            results[count] = minNode[1];
+            results[count] = minNode[0];
             count--;
         }
 
