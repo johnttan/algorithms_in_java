@@ -1,5 +1,3 @@
-package src.week5;
-
 /*************************************************************************
  *  Compilation:  javac KdTreeVisualizer.java
  *  Execution:    java KdTreeVisualizer

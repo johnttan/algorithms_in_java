@@ -32,21 +32,15 @@ public class SeamCarver {
     }
     
     private double getEnergy(int[][][] picture, int x, int y){
-        int[] left = new int[3];
-        int[] right = new int[3];
-        int[] top = new int[3];
-        int[] bottom = new int[3];
-
         if(x < 1 || x > picture.length-2 || y < 1 || y > picture[0].length-2){
             return 195075;
         }
-        bottom = picture[x][y + 1];
-        top = picture[x][y - 1];
-        left = picture[x - 1][y];
-        right = picture[x + 1][y];
-        double ySum = 0;
+        int[] bottom = picture[x][y + 1];
+        int[] top = picture[x][y - 1];
+        int[] left = picture[x - 1][y];
+        int[] right = picture[x + 1][y];
         double xSum = Math.pow(right[2] - left[2], 2) + Math.pow(right[1] - left[1], 2) + Math.pow(right[0] - left[0], 2);
-        ySum = Math.pow(bottom[2] - top[2], 2) + Math.pow(bottom[1] - top[1], 2) + Math.pow(bottom[0] - top[0], 2);
+        double ySum = Math.pow(bottom[2] - top[2], 2) + Math.pow(bottom[1] - top[1], 2) + Math.pow(bottom[0] - top[0], 2);
  
         return xSum + ySum;
     }
@@ -142,44 +136,50 @@ public class SeamCarver {
 //        Only transpose if orientation is wrong.
         updateGrids();
         int[] results = new int[tempPic.length];
-        double[][] dist = new double[tempPic.length][tempPic[0].length];
+        double[] oldDist = new double[tempPic[0].length];
+        double[] dist = new double[tempPic[0].length];
         int[][][] parentEdge = new int[tempPic.length][tempPic[0].length][2];
         
         for(int x=0;x<tempPic.length;x++){
             for(int y=0;y<tempPic[0].length;y++){
-                dist[x][y] = Double.MAX_VALUE;
+                dist[y] = Double.MAX_VALUE;
                 parentEdge[x][y] = new int[]{-1, -1};
             }
         }
         for (int y = 0; y < tempPic[0].length; y++) {
-            dist[0][y] = energy(0, y);
+            oldDist[y] = energy(0, y);
         }
         for(int x=1;x<tempPic.length;x++){
             for(int y=0;y<tempPic[0].length;y++){
                 double ener = energy(x, y);
-                if(y > 0 && dist[x-1][y-1] + ener < dist[x][y]){
-                    dist[x][y] = dist[x - 1][y - 1] + ener;
+                if(y > 0 && oldDist[y-1] + ener < dist[y]){
+                    dist[y] = oldDist[y - 1] + ener;
                     parentEdge[x][y][0] = x-1;
                     parentEdge[x][y][1] = y - 1;
                 }
-                if (y < tempPic[0].length-1 && dist[x - 1][y + 1] + ener < dist[x][y]) {
-                    dist[x][y] = dist[x - 1][y + 1] + ener;
+                if (y < tempPic[0].length-1 && oldDist[y + 1] + ener < dist[y]) {
+                    dist[y] = oldDist[y + 1] + ener;
                     parentEdge[x][y][0] = x - 1;
                     parentEdge[x][y][1] = y + 1;
                 }
-                if (dist[x - 1][y] + ener < dist[x][y]) {
-                    dist[x][y] = dist[x - 1][y] + ener;
+                if (oldDist[y] + ener < dist[y]) {
+                    dist[y] = oldDist[y] + ener;
                     parentEdge[x][y][0] = x - 1;
                     parentEdge[x][y][1] = y;
                 }
+            }
+            System.arraycopy(dist, 0, oldDist, 0, dist.length);
+            dist = new double[tempPic[0].length];
+            for (int y = 0; y < tempPic[0].length; y++) {
+                dist[y] = Double.MAX_VALUE;
             }
         }
         int[] minNode = new int[2];
         double minDist = Double.MAX_VALUE;
 //        Get start of shortest path;
         for(int y=0;y<tempPic[0].length;y++){
-            if(dist[tempPic.length-1][y] < minDist){
-                minDist = dist[tempPic.length - 1][y];
+            if(oldDist[y] < minDist){
+                minDist = oldDist[y];
                 minNode[0] = tempPic.length-1;
                 minNode[1] = y;
             }
@@ -200,7 +200,8 @@ public class SeamCarver {
     public int[] findVerticalSeam() {
         updateGrids();
         int[] results = new int[tempPic[0].length];
-        double[][] dist = new double[tempPic.length][tempPic[0].length];
+        double[][] oldDist = new double[tempPic.length];
+        double[][] dist = new double[tempPic.length];
         int[][][] parentEdge = new int[tempPic.length][tempPic[0].length][2];
 
         for (int x = 0; x < tempPic.length; x++) {
